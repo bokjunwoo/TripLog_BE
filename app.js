@@ -87,6 +87,10 @@ app.use('/like', like);
 const list = require('./routes/listRouter');
 app.use('/list', list);
 
+// mypage
+const mypage = require('./routes/mypageRouter');
+app.use('/mypage', mypage);
+
 /* 오류발생 */
 app.use((err, req, res, next) => {
   console.log(err.stack);
