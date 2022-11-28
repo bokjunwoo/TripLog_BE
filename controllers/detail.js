@@ -3,28 +3,29 @@ const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
 const checkDB = {
-  getAlldata: async () => {
+  // 전체 데이터
+  getAlldetail: async (params) => {
     const client = await _client;
-    const db = client.db('triplog').collection('detail');
-    const data = await db.find({}).toArray();
+    const db = client.db('triplog').collection(`${params.region}`);
+    const data = await db.findOne({ contentid: `${params.contentId}` });
     return data;
   },
 
-  // getTourdata: async (tourData) => {
-  //   const client = await _client;
-  //   const db = client.db('triplog').collection('detail');
-  //   const find = await db.findOne({ contentId: tourData.contentId });
-  //   if (find === null) {
-  //     const insertRes = await db.insertOne({ tourData });
-  //     if (insertRes.acknowledged) {
-  //       return insertRes;
-  //     } else {
-  //       throw new Error('통신 이상');
-  //     }
-  //   } else {
-  //     return find;
-  //   }
-  // },
+  // 리뷰, 별점 데이터
+  getEtcdetail: async (contentId) => {
+    const client = await _client;
+    const db = client.db('triplog').collection('contentid');
+    const data = await db.findOne({ contentid: contentId });
+    return data;
+  },
+
+  // 사용자의 좋아요 항목 가져오기
+  postLikeClick: async (likeData) => {
+    const client = await _client;
+    const db = client.db('triplog').collection('likes');
+    const data = await db.findOne({ nickName: likeData.nickName });
+    return data;
+  },
 
   // 조회수 +1
   getData: async ({ data }) => {
