@@ -25,35 +25,22 @@ const limits = {
 
 const upload = multer({ storage, limits });
 
-// get all data
-router.get('/', async (req, res) => {
-  const data = await mongoDB.getAlldata();
-  res.send(data);
-});
-
-// 리뷰 요청(GET)
-router.post('/', async (req, res) => {
-  const data = await mongoDB.getUserReview(req.body);
-  res.send(data);
-});
-
+// 디테일페이지 리뷰 요청(GET)
 router.get('/:contentId', async (req, res) => {
-  req.params.contentId = parseInt(req.params.contentId);
-  // 여기서 getRiview 메소드를 호출 할 때 getReivew() 의 인자로 req.params.contentsId 를 넘겨주기
   const data = await mongoDB.getReview(req.params.contentId);
   res.send(JSON.stringify(data));
 });
 
-// 리뷰 작성(POST)
-router.post('/write', async (req, res) => {
-  const data = await mongoDB.saveReview(req.body);
-  res.send(JSON.stringify(data));
-});
-
-// 리뷰 작성 IMG (POST)
-router.post('/img', upload.single('img'), async (req, res) => {
+// 리뷰 작성 IMG(POST)
+router.post('/image', upload.single('image'), async (req, res) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
   res.send(JSON.stringify(req.file.filename));
+});
+
+// 리뷰 작성(POST)
+router.post('/write', async (req, res) => {
+  const data = await mongoDB.postSaveReview(req.body);
+  res.send(JSON.stringify(data));
 });
 
 // 리뷰 수정(GET)

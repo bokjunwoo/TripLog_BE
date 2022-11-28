@@ -12,36 +12,29 @@ const reviewDB = {
     return data;
   },
 
-  // 리뷰 전체 요청
-  getAlldata: async () => {
-    const client = await _client;
-    const db = client.db('triplog').collection('reviews');
-    const data = await db.find({}).toArray();
-    return data;
-  },
-
   // 리뷰 요청(GET)
-  getReview: async (contentId) => {
+  getReview: async (contentid) => {
     const client = await _client;
-    const db = client.db('triplog').collection('reviews');
+    const db = client.db('triplog').collection('review');
 
     const data = await db
-      .find({ contentId: contentId.toString() })
+      .find({ contentid: contentid })
       .sort({ _id: -1 })
       .toArray();
     return data;
   },
 
   // 리뷰 작성(POST)
-  saveReview: async (review) => {
+  postSaveReview: async (review) => {
     const client = await _client;
-    const db = client.db('triplog').collection('reviews');
+    const db = client.db('triplog').collection('review');
 
-    const contentId = review[0].contentId;
-    const content = review[0].content;
+    const contentid = review[0].contentid;
     const nickName = review[0].nickName;
-    const star = review[0].star;
-    const img = review[0].img;
+    const userImage = review[0].userImage;
+    const content = review[0].contentData;
+    const star = review[0].starData;
+    const image = review[0].image;
     const today = new Date();
     const year = today.getFullYear();
     const month = ('0' + (today.getMonth() + 1)).slice(-2);
@@ -52,16 +45,18 @@ const reviewDB = {
       year + '.' + month + '.' + day + ' ' + hours + ':' + minutes;
 
     const saveReview = {
-      contentId,
+      contentid,
       nickName,
+      userImage,
       content,
       star,
       dateFull,
-      img,
+      image,
     };
-    const plan = await db.insertOne(saveReview);
 
-    if (plan.acknowledged) {
+    const reviewData = await db.insertOne(saveReview);
+
+    if (reviewData.acknowledged) {
       return true;
     } else {
       throw new Error('통신이상');
@@ -71,7 +66,7 @@ const reviewDB = {
   // 리뷰 수정(GET)
   getEmendReview: async (_id) => {
     const client = await _client;
-    const db = client.db('triplog').collection('reviews');
+    const db = client.db('triplog').collection('review');
     const data = await db.findOne({ _id: ObjectId(_id) });
     return data;
   },
@@ -83,7 +78,7 @@ const reviewDB = {
     const nickName = emendData[0].nickName;
 
     const client = await _client;
-    const db = client.db('triplog').collection('reviews');
+    const db = client.db('triplog').collection('review');
     const data = await db.updateOne(
       { _id: ObjectId(contentId), nickName: nickName },
       {

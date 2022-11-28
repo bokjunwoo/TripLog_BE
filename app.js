@@ -11,12 +11,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // 이미지 저장 위치
-// app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 
-// 쿠키 parser 로딩 후 app에 등록
-const cookieParser = require('cookie-parser');
-app.use(cookieParser());
+/*
+데이터 저장하기 위해 전송 데이터 제한해제
+app.use(express.json({
+  limit : "50mb"
+}));
+app.use(express.urlencoded({
+  limit:"50mb",
+  extended: false
+}));
+*/
 
 /* 사용안함
 // express-session
@@ -76,6 +82,10 @@ app.use('/user', user);
 // like
 const like = require('./routes/likeRouter');
 app.use('/like', like);
+
+// list
+const list = require('./routes/listRouter');
+app.use('/list', list);
 
 /* 오류발생 */
 app.use((err, req, res, next) => {
