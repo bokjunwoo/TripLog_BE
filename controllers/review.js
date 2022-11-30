@@ -26,7 +26,6 @@ const reviewDB = {
 
   // 리뷰 작성(POST)
   postSaveReview: async (review) => {
-    console.log(review);
     const client = await _client;
     const reviewdb = client.db('triplog').collection('review');
     const stardb = client.db('triplog').collection(`${review[0].region}`);
