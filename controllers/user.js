@@ -52,6 +52,7 @@ const usersDB = {
       };
     }
   },
+  
   // 닉네임 중복확인
   nameCheck: async (registerName) => {
     console.log(registerName);
@@ -72,7 +73,6 @@ const usersDB = {
 
   // 회원 가입 모듈
   register: async (registerInfo) => {
-    console.log('!!!!', registerInfo);
     const client = await _client;
     const db = client.db('triplog').collection('users');
     // 동일한 Email 이 DB에 있는지 체크
@@ -94,7 +94,7 @@ const usersDB = {
           nickName: registerInfo.nickName,
           password: hash.hashedPassword,
           salt: hash.salt,
-          img: '',
+          image: '',
         };
         console.log('@', registerUser);
       } else {
@@ -119,6 +119,7 @@ const usersDB = {
       }
     }
   },
+
   // 로그인 모듈
   login: async (loginInfo) => {
     console.log(loginInfo);
@@ -140,7 +141,7 @@ const usersDB = {
           result: true,
           email: findID.email,
           nickName: findID.nickName,
-          img: findID.img,
+          image: findID.image,
           msg: '로그인 성공! 메인 페이지로 이동 합니다.',
         };
       } else {
@@ -164,11 +165,11 @@ const usersDB = {
     const db = client.db('triplog').collection('users');
 
     const nickName = user[0].nickName;
-    const img = user[0].img;
+    const image = user[0].img;
 
     const updataRes = await db.updateOne(
       { nickName: nickName },
-      { $set: { img: img } }
+      { $set: { image: image } }
     );
 
     if (updataRes.acknowledged) {
