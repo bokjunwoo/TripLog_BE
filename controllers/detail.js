@@ -69,6 +69,7 @@ const checkDB = {
       throw new Error('통신 이상');
     }
   },
+  
   // 좋아요 -1
   deleteLike: async (contentId) => {
     const client = await _client;
