@@ -6,7 +6,7 @@ const apiDB = {
   // 전체 데이터 저장
   postAlldata: async (data) => {
     const client = await _client;
-    const db = client.db('triplog').collection('jeju');
+    const db = client.db('triplog').collection('seoul');
 
     for (let i = 0; i < data.length; i++) {
       const contentid = data[i].contentid;
@@ -21,11 +21,11 @@ const apiDB = {
 
       const saveData = {
         contentid,
-        // type: 'sightseeing',
+        type: 'sightseeing',
         // type: 'culture',
         // type: 'lodgment',
         // type: 'shopping',
-        type: 'food',
+        // type: 'food',
         title,
         addr1,
         addr2,
@@ -35,7 +35,7 @@ const apiDB = {
         firstimage2,
         tel,
         view: 0,
-        star: 0,
+        star: [],
         like: 0,
       };
 

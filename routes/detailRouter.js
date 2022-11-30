@@ -5,14 +5,14 @@ const router = express.Router();
 const mongoDB = require('../controllers/detail');
 
 // 전체 데이터(GET)
-router.get('/:region/:contentId', async (req, res) => {
+router.get('/:region/:contentid', async (req, res) => {
   const data = await mongoDB.getAlldetail(req.params);
   res.send(JSON.stringify(data));
 });
 
 // 조회수, 별점, 좋아요(GET)
-router.get('/:contentId', async (req, res) => {
-  const data = await mongoDB.getEtcdetail(req.params.contentId);
+router.get('/:contentid', async (req, res) => {
+  const data = await mongoDB.getEtcdetail(req.params.contentid);
   res.send(JSON.stringify(data));
 });
 

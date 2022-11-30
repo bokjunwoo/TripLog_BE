@@ -26,14 +26,17 @@ const reviewDB = {
 
   // 리뷰 작성(POST)
   postSaveReview: async (review) => {
+    console.log(review);
     const client = await _client;
-    const db = client.db('triplog').collection('review');
+    const reviewdb = client.db('triplog').collection('review');
+    const stardb = client.db('triplog').collection(`${review[0].region}`);
 
     const contentid = review[0].contentid;
+    const title = review[0].title;
     const nickName = review[0].nickName;
     const userImage = review[0].userImage;
     const content = review[0].contentData;
-    const star = review[0].starData;
+    const star = parseInt(review[0].starData);
     const image = review[0].image;
     const today = new Date();
     const year = today.getFullYear();
@@ -46,6 +49,7 @@ const reviewDB = {
 
     const saveReview = {
       contentid,
+      title,
       nickName,
       userImage,
       content,
@@ -54,9 +58,14 @@ const reviewDB = {
       image,
     };
 
-    const reviewData = await db.insertOne(saveReview);
+    const reviewData = await reviewdb.insertOne(saveReview);
 
-    if (reviewData.acknowledged) {
+    const starData = await stardb.updateOne(
+      { contentid: contentid },
+      { $push: { star: star } }
+    );
+
+    if (reviewData.acknowledged && starData.acknowledged) {
       return true;
     } else {
       throw new Error('통신이상');
@@ -98,7 +107,7 @@ const reviewDB = {
   // 리뷰 삭제(DELETE)
   deleteReview: async (_id) => {
     const client = await _client;
-    const db = client.db('triplog').collection('reviews');
+    const db = client.db('triplog').collection('review');
     const review = await db.deleteOne({ _id: ObjectId(_id) });
 
     if (review.acknowledged) {

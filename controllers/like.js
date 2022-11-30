@@ -2,17 +2,37 @@ const mongoClient = require('../routes/mongo');
 
 const _client = mongoClient.connect();
 
-// const init = {
-//   userId: 'test',
-//   likes: [{ contentId: '126081', title: '한라산 (제주도 국가지질공원)' }],
-// };
-
-const init = {
-  userId: 'test',
-  likes: ['126081'],
-};
-
 const likeDB = {
+  likeIncPlus: async (contentid) => {
+    const client = await _client;
+    const db = client.db('triplog').collection('contentid');
+    const likePlus = await db.updateOne(
+      { contentid: contentid },
+      { $inc: { like: +1 } }
+    );
+
+    if (likePlus.acknowledged) {
+      return likePlus;
+    } else {
+      throw new Error('통신 이상');
+    }
+  },
+
+  likeIncMinus: async (contentid) => {
+    const client = await _client;
+    const db = client.db('triplog').collection('contentid');
+    const likeMinus = await db.updateOne(
+      { contentid: contentid },
+      { $inc: { like: -1 } }
+    );
+
+    if (likeMinus.acknowledged) {
+      return true;
+    } else {
+      throw new Error('통신 이상');
+    }
+  },
+
   // setData
   setData: async () => {
     const client = await _client;
