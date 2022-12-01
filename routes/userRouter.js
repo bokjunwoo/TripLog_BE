@@ -62,14 +62,14 @@ router.post('/login', async (req, res) => {
 });
 
 // 유저 IMG (POST)
-router.post('/img', upload.single('img'), async (req, res) => {
+router.post('/image', upload.single('image'), async (req, res) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
   res.send(JSON.stringify(req.file.filename));
 });
 
 // 유저 IMG 업로드(POST)
 router.post('/upload', async (req, res) => {
-  const data = await mongoDB.updateImg(req.body);
+  const data = await mongoDB.updateImage(req.body);
   res.send(JSON.stringify(data));
 });
 

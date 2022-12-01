@@ -37,7 +37,6 @@ const usersDB = {
 
   // 아이디 중복확인
   idCheck: async (registerId) => {
-    console.log(registerId);
     const client = await _client;
     const db = client.db('triplog').collection('users');
     const idCheck = await db.findOne({ email: registerId.email });
@@ -52,10 +51,9 @@ const usersDB = {
       };
     }
   },
-  
+
   // 닉네임 중복확인
   nameCheck: async (registerName) => {
-    console.log(registerName);
     const client = await _client;
     const db = client.db('triplog').collection('users');
     const nameCheck = await db.findOne({ email: registerName.nickName });
@@ -85,7 +83,6 @@ const usersDB = {
       };
     } else {
       let registerUser = {};
-      console.log(registerInfo.type);
       if (registerInfo.type === 'local') {
         const hash = createHashedPassword(registerInfo.password);
         registerUser = {
@@ -96,14 +93,12 @@ const usersDB = {
           salt: hash.salt,
           image: '',
         };
-        console.log('@', registerUser);
       } else {
         registerUser = {
           type: registerInfo.type,
           email: registerInfo.email,
           nickName: registerInfo.nickName,
         };
-        console.log('#', registerUser);
       }
 
       // 만들어진 회원 가입 정보 DB에 삽입!
@@ -122,7 +117,6 @@ const usersDB = {
 
   // 로그인 모듈
   login: async (loginInfo) => {
-    console.log(loginInfo);
     const client = await _client;
     const db = client.db('triplog').collection('users');
     // 로그인 시 입력한 email 정보가 db 에 있는지 체크
@@ -160,12 +154,12 @@ const usersDB = {
   },
 
   // 유저 이미지 업데이트(POST)
-  updateImg: async (user) => {
+  updateImage: async (user) => {
     const client = await _client;
     const db = client.db('triplog').collection('users');
 
     const nickName = user[0].nickName;
-    const image = user[0].img;
+    const image = user[0].image;
 
     const updataRes = await db.updateOne(
       { nickName: nickName },
