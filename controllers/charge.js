@@ -11,10 +11,10 @@ const chargeDB = {
     const find = await db.findOne({ nickName: nickName });
 
     if (find === null) {
-      const insertRes = await db.insertOne(
-        { nickName: nickName },
-        { chargeList: [] }
-      );
+      const insertRes = await db.insertOne({
+        nickName: nickName,
+        chargeList: [],
+      });
       if (insertRes.acknowledged) {
         return insertRes;
       } else {
