@@ -98,7 +98,7 @@ const usersDB = {
           type: registerInfo.type,
           email: registerInfo.email,
           nickName: registerInfo.nickName,
-          userImage: registerInfo.userImage
+          image: registerInfo.image,
         };
       }
 
