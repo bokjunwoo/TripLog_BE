@@ -98,6 +98,7 @@ const usersDB = {
           type: registerInfo.type,
           email: registerInfo.email,
           nickName: registerInfo.nickName,
+          userImage: registerInfo.userImage
         };
       }
 
@@ -129,7 +130,7 @@ const usersDB = {
         findID.password
       );
 
-      // 비밀 번호 일치 여부를 토대로 로그인 처리
+      // 비밀 번호 일치 여부를 토대로 로그인 처리      
       if (passwordCheckResult) {
         return {
           result: true,
