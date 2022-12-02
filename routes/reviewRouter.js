@@ -56,8 +56,8 @@ router.post('/emend', async (req, res) => {
 });
 
 // 리뷰 삭제(DELETE)
-router.delete('/delete/:_id', async (req, res) => {
-  const data = await mongoDB.deleteReview(req.params._id);
+router.delete('/delete', async (req, res) => {
+  const data = await mongoDB.deleteReview(req.body);
   res.send(JSON.stringify(data));
 });
 

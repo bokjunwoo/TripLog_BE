@@ -28,7 +28,7 @@ const reviewDB = {
   postSaveReview: async (review) => {
     const client = await _client;
     const reviewdb = client.db('triplog').collection('review');
-    const stardb = client.db('triplog').collection(`${review[0].region}`);
+    const regiondb = client.db('triplog').collection(`${review[0].region}`);
 
     const contentid = review[0].contentid;
     const title = review[0].title;
@@ -38,6 +38,7 @@ const reviewDB = {
     const star = parseInt(review[0].starData);
     const image = review[0].image;
     const today = new Date();
+    const writeTime = today.toString();
     const year = today.getFullYear();
     const month = ('0' + (today.getMonth() + 1)).slice(-2);
     const day = ('0' + today.getDate()).slice(-2);
@@ -47,6 +48,7 @@ const reviewDB = {
       year + '.' + month + '.' + day + ' ' + hours + ':' + minutes;
 
     const saveReview = {
+      writeTime,
       contentid,
       title,
       nickName,
@@ -59,9 +61,9 @@ const reviewDB = {
 
     const reviewData = await reviewdb.insertOne(saveReview);
 
-    const starData = await stardb.updateOne(
+    const starData = await regiondb.updateOne(
       { contentid: contentid },
-      { $push: { star: star } }
+      { $push: { star: { star: star, writeTime: writeTime } } }
     );
 
     if (reviewData.acknowledged && starData.acknowledged) {
@@ -104,12 +106,21 @@ const reviewDB = {
   },
 
   // 리뷰 삭제(DELETE)
-  deleteReview: async (_id) => {
+  deleteReview: async (review) => {
     const client = await _client;
-    const db = client.db('triplog').collection('review');
-    const review = await db.deleteOne({ _id: ObjectId(_id) });
+    const reviewdb = client.db('triplog').collection('review');
+    const regiondb = client.db('triplog').collection(`${review[0].region}`);
 
-    if (review.acknowledged) {
+    const reviewData = await reviewdb.deleteOne({
+      _id: ObjectId(review[0]._id),
+    });
+
+    const regionData = await regiondb.updateOne(
+      { contentid: review[0].contentid },
+      { $pull: { star: { star: review[0].star, writeTime: review[0].writeTime } } }
+    );
+
+    if (reviewData.acknowledged && regionData.acknowledged) {
       return true;
     } else {
       throw new Error('통신이상');
