@@ -8,21 +8,8 @@ const chargeDB = {
   postCharge: async ({ nickName }) => {
     const client = await _client;
     const db = client.db('triplog').collection('charge');
-    const find = await db.findOne({ nickName: nickName });
-
-    if (find === null) {
-      const insertRes = await db.insertOne({
-        nickName: nickName,
-        chargeList: [],
-      });
-      if (insertRes.acknowledged) {
-        return insertRes;
-      } else {
-        throw new Error('통신 이상');
-      }
-    } else {
-      return find;
-    }
+    const data = await db.findOne({ nickName: nickName });
+    return data;
   },
 
   // 금액 추가(POST)
