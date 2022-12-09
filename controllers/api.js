@@ -3,7 +3,7 @@ const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
 const apiDB = {
-  // 전체 데이터 저장
+  // 전체 데이터 저장(POST)
   postAlldata: async (data) => {
     const client = await _client;
     const db = client.db('triplog').collection('');
@@ -43,7 +43,7 @@ const apiDB = {
     }
   },
 
-  // 리뷰, 별점 저장
+  // contentid, like 저장(POST)
   postEtcdata: async (data) => {
     const client = await _client;
     const db = client.db('triplog').collection('contentid');

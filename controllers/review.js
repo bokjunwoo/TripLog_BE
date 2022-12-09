@@ -5,14 +5,7 @@ const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
 const reviewDB = {
-  getUserReview: async ({ nickName }) => {
-    const client = await _client;
-    const db = client.db('triplog').collection('reviews');
-    const data = await db.find({ nickName: nickName }).toArray();
-    return data;
-  },
-
-  // 리뷰 요청(GET)
+  // 디테일페이지 리뷰 요청(GET)
   getReview: async (contentid) => {
     const client = await _client;
     const db = client.db('triplog').collection('review');

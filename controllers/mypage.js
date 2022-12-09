@@ -3,7 +3,7 @@ const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
 const mypageDB = {
-  // params의 데이터 가져오기
+  // params의 데이터 가져오기(GET)
   getMypage: async (params) => {
     // console.log(params);
     const client = await _client;

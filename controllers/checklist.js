@@ -3,15 +3,15 @@ const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
 const checkDB = {
-  // item 불러오기
-  getItem: async ({ nickName }) => {
+  // item 요청(POST)
+  postItem: async ({ nickName }) => {
     const client = await _client;
     const db = client.db('triplog').collection('checklist');
     const data = await db.findOne({ nickName: nickName });
     return data
   },
 
-  // item 추가
+  // item 추가(POST)
   addItem: async (item) => {
     const client = await _client;
     const db = client.db('triplog').collection('checklist');
@@ -30,7 +30,7 @@ const checkDB = {
     }
   },
 
-  // checked 변경
+  // checked 변경(POST)
   checkedItem: async (el) => {
     const client = await _client;
     const db = client.db('triplog').collection('checklist');
@@ -45,7 +45,7 @@ const checkDB = {
     }
   },
 
-  // checked 삭제
+  // checked 삭제(DELETE)
   deleteItem: async (el) => {
     const client = await _client;
     const db = client.db('triplog').collection('checklist');

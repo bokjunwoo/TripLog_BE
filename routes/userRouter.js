@@ -25,43 +25,41 @@ const limits = {
 
 const upload = multer({ storage, limits });
 
-// 회원가입 아이디 중복확인
+// 회원가입 아이디 중복확인(POST)
 router.post('/register/idcheck', async (req, res) => {
   const registerId = req.body;
   const result = await mongoDB.idCheck(registerId);
   res.send(JSON.stringify(result));
 });
 
-// 회원가입 닉네임 중복확인
+// 회원가입 닉네임 중복확인(POST)
 router.post('/register/namecheck', async (req, res) => {
   const registerId = req.body;
   const result = await mongoDB.nameCheck(registerId);
   res.send(JSON.stringify(result));
 });
 
-// 각 주소에 따른 라우팅 처리
-// 회원가입, 로그인은 전부 컨트롤러에서 처리되고 있으니
-// 컨트롤러에서 값을 받아서 전달하는 역할을 함
+// 회원 가입 모듈(POST)
 router.post('/register', async (req, res) => {
   const registerInfo = req.body;
   const result = await mongoDB.register(registerInfo);
   res.send(JSON.stringify(result));
 });
 
-// 로그인 처리
+// 로그인(POST)
 router.post('/login', async (req, res) => {
   const loginInfo = req.body;
   const result = await mongoDB.login(loginInfo);
   res.send(JSON.stringify(result));
 });
 
-// 유저 IMG (POST)
+// 유저 IMG(POST)
 router.post('/image', upload.single('image'), async (req, res) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
   res.send(JSON.stringify(req.file.filename));
 });
 
-// 유저 IMG 업로드(POST)
+// 유저 이미지 업로드(POST)
 router.post('/upload', async (req, res) => {
   const data = await mongoDB.updateImage(req.body);
   res.send(JSON.stringify(data));

@@ -3,6 +3,7 @@ const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
 const likeDB = {
+  // plus 요청(POST)
   likeIncPlus: async (data) => {
     const client = await _client;
     
@@ -29,6 +30,7 @@ const likeDB = {
     }
   },
 
+  // minus 요청(POST)
   likeIncMinus: async (data) => {
     const client = await _client;
     

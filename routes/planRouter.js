@@ -10,13 +10,4 @@ router.post('/', async (req, res) => {
   res.send(JSON.stringify(data));
 });
 
-// 내 여행 불러오기
-router.post('/getplan', async (req, res) => {
-  // console.log(req.body);
-  const data = await mongoDB.getPlan(req.body);
-  res.send(JSON.stringify(data));
-});
-
-// 내 여행 수정
-
 module.exports = router;

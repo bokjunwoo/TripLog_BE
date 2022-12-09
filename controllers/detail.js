@@ -3,7 +3,7 @@ const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
 const checkDB = {
-  // 디테일 데이터
+  // 디테일 데이터(GET)
   getAlldetail: async (params) => {
     const client = await _client;
     const db = client.db('triplog').collection(`${params.region}`);
@@ -22,7 +22,7 @@ const checkDB = {
     return data;
   },
 
-  // 해당 디테일 정보의 리뷰, 별점 데이터
+  // 해당 디테일 정보의 리뷰, 별점 데이터(GET)
   getEtcdetail: async (contentid) => {
     const client = await _client;
     const db = client.db('triplog').collection('contentid');

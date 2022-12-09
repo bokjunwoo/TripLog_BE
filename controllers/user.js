@@ -1,6 +1,5 @@
 const mongoClient = require('../routes/mongo');
 
-// _여러번 실행되는 걸 막음
 const _client = mongoClient.connect();
 
 // 체크리스트 기본 설정 값
@@ -62,7 +61,7 @@ const verifyPassword = (password, salt, userPassword) => {
 };
 
 const usersDB = {
-  // 아이디 중복확인
+  // 회원가입 아이디 중복확인(POST)
   idCheck: async (registerId) => {
     const client = await _client;
     const userdb = client.db('triplog').collection('users');
@@ -79,7 +78,7 @@ const usersDB = {
     }
   },
 
-  // 닉네임 중복확인
+  // 회원가입 닉네임 중복확인(POST)
   nameCheck: async (registerName) => {
     const client = await _client;
     const userdb = client.db('triplog').collection('users');
@@ -96,7 +95,7 @@ const usersDB = {
     }
   },
 
-  // 회원 가입 모듈
+  // 회원 가입 모듈(POST)
   register: async (registerInfo) => {
     const client = await _client;
     const userdb = client.db('triplog').collection('users');
@@ -154,7 +153,7 @@ const usersDB = {
     }
   },
 
-  // 로그인 모듈
+  // 로그인(POST)
   login: async (loginInfo) => {
     const client = await _client;
     const userdb = client.db('triplog').collection('users');
@@ -192,7 +191,7 @@ const usersDB = {
     }
   },
 
-  // 유저 이미지 업데이트(POST)
+  // 유저 이미지 업로드(POST)
   updateImage: async (user) => {
     const client = await _client;
     const userdb = client.db('triplog').collection('users');
