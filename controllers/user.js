@@ -3,6 +3,41 @@ const mongoClient = require('../routes/mongo');
 // _여러번 실행되는 걸 막음
 const _client = mongoClient.connect();
 
+// 체크리스트 기본 설정 값
+const initCheckState = {
+  checked: [],
+  items: [
+    {
+      title: '기본 짐싸기',
+      content: [
+        '의류',
+        '전자기기 챙기기',
+        '세안용품',
+        '상비약',
+        '신분증/면허증',
+        '필기구',
+        '마스크/손 소독제',
+      ],
+    },
+    {
+      title: '필수 준비물',
+      content: ['숙소'],
+    },
+    {
+      title: '트립로그에서 챙기기',
+      content: ['여행 일정짜기', '가계부 짜기'],
+    },
+    {
+      title: '통신/교통 준비',
+      content: ['여행지 교통편'],
+    },
+    {
+      title: '즐길거리 준비',
+      content: ['관광 정보 확인하기', '맛집 정보 확인하기'],
+    },
+  ],
+};
+
 const crypto = require('crypto');
 
 // 비밀 번호 생성용 함수
@@ -27,19 +62,11 @@ const verifyPassword = (password, salt, userPassword) => {
 };
 
 const usersDB = {
-  // get data
-  getUser: async ({ nickName }) => {
-    const client = await _client;
-    const db = client.db('triplog').collection('users');
-    const data = await db.findOne({ nickName: nickName });
-    return data;
-  },
-
   // 아이디 중복확인
   idCheck: async (registerId) => {
     const client = await _client;
-    const db = client.db('triplog').collection('users');
-    const idCheck = await db.findOne({ email: registerId.email });
+    const userdb = client.db('triplog').collection('users');
+    const idCheck = await userdb.findOne({ email: registerId.email });
 
     if (idCheck === null) {
       return {
@@ -55,8 +82,8 @@ const usersDB = {
   // 닉네임 중복확인
   nameCheck: async (registerName) => {
     const client = await _client;
-    const db = client.db('triplog').collection('users');
-    const nameCheck = await db.findOne({ email: registerName.nickName });
+    const userdb = client.db('triplog').collection('users');
+    const nameCheck = await userdb.findOne({ email: registerName.nickName });
 
     if (nameCheck === null) {
       return {
@@ -72,9 +99,12 @@ const usersDB = {
   // 회원 가입 모듈
   register: async (registerInfo) => {
     const client = await _client;
-    const db = client.db('triplog').collection('users');
+    const userdb = client.db('triplog').collection('users');
+    const chargedb = client.db('triplog').collection('charge');
+    const checkdb = client.db('triplog').collection('checklist');
     // 동일한 Email 이 DB에 있는지 체크
-    const duplicated = await db.findOne({ email: registerInfo.email });
+    const duplicated = await userdb.findOne({ email: registerInfo.email });
+    
     // 동일한 Email 이 있으면 회원 가입 실패 -> 해당 문구 안내
     if (duplicated) {
       return {
@@ -102,10 +132,18 @@ const usersDB = {
         };
       }
 
-      // 만들어진 회원 가입 정보 DB에 삽입!
-      const result = await db.insertOne(registerUser);
+      // 만들어진 회원 가입 정보 DB에 저장
+      const result = await userdb.insertOne(registerUser);
+      // 만들어진 회원 정보에 따른 가계부 저장
+      const chargeInsert = await chargedb.insertOne({
+        nickName: registerInfo.nickName,
+        chargeList: [],
+      });
+      // 만들어진 회원 정보에 따른 체크리스트 저장
+      const checkInsert = await checkdb.insertOne(initCheckState)
+
       // 정보 처리가 완료되면 회원 가입 성공 여부 전달
-      if (result.acknowledged) {
+      if (result.acknowledged && chargeInsert.acknowledged && checkInsert.acknowledged) {
         return {
           duplicated: false,
           msg: '회원 가입 성공! 로그인 페이지로 이동 합니다.',
@@ -119,9 +157,9 @@ const usersDB = {
   // 로그인 모듈
   login: async (loginInfo) => {
     const client = await _client;
-    const db = client.db('triplog').collection('users');
+    const userdb = client.db('triplog').collection('users');
     // 로그인 시 입력한 email 정보가 db 에 있는지 체크
-    const findID = await db.findOne({ email: loginInfo.email });
+    const findID = await userdb.findOne({ email: loginInfo.email });
     // db에 email 이 있으면, 비밀 번호 확인 후 로그인 처리
     if (findID) {
       const passwordCheckResult = verifyPassword(
@@ -157,12 +195,12 @@ const usersDB = {
   // 유저 이미지 업데이트(POST)
   updateImage: async (user) => {
     const client = await _client;
-    const db = client.db('triplog').collection('users');
+    const userdb = client.db('triplog').collection('users');
 
     const nickName = user[0].nickName;
     const image = user[0].image;
 
-    const updataRes = await db.updateOne(
+    const updataRes = await userdb.updateOne(
       { nickName: nickName },
       { $set: { image: image } }
     );

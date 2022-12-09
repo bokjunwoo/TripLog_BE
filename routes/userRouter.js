@@ -25,12 +25,6 @@ const limits = {
 
 const upload = multer({ storage, limits });
 
-// 유저정보 (POST)
-router.post('/', async (req, res) => {
-  const data = await mongoDB.getUser(req.body);
-  res.send(JSON.stringify(data));
-});
-
 // 회원가입 아이디 중복확인
 router.post('/register/idcheck', async (req, res) => {
   const registerId = req.body;
