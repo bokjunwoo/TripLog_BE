@@ -14,9 +14,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// 이미지 저장 위치
-app.use('/uploads', express.static('uploads'));
-
 /*
 // 데이터 저장하기 위해 전송 데이터 제한해제
 app.use(express.json({
@@ -26,35 +23,13 @@ app.use(express.urlencoded({
   limit:"50mb",
   extended: false
 }));
+
 // api
 const apiRouter = require('./routes/apiRouter');
 app.use('/api', apiRouter);
 */
 
-/* 사용안함
-// express-session
-const session = require('express-session');
-
-// passport
-const passport = require('passport');
-
-app.use(
-  session({
-    secret: 'triplog',
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 1000 * 60 * 60,
-    },
-  })
-);
-
-// passport session 
-app.use(passport.initialize());
-app.use(passport.session());
-/*
-
-/* image */
+/* image 저장 위치 */
 app.use('/uploads', express.static('uploads'));
 
 /* routes */
