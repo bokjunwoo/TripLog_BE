@@ -8,7 +8,7 @@ const checkDB = {
     const client = await _client;
     const db = client.db('triplog').collection('checklist');
     const data = await db.findOne({ nickName: nickName });
-    return data
+    return data;
   },
 
   // item 추가(POST)

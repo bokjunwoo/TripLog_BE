@@ -35,7 +35,6 @@ const chargeDB = {
   deleteCharge: async (data) => {
     const client = await _client;
     const db = client.db('triplog').collection('charge');
-    console.log(data);
     const charge = await db.updateOne(
       { nickName: data.nickName },
       {
@@ -54,7 +53,6 @@ const chargeDB = {
   deleteAll: async (data) => {
     const client = await _client;
     const db = client.db('triplog').collection('charge');
-    console.log(data);
     const charge = await db.updateOne(
       { nickName: data.nickName },
       {

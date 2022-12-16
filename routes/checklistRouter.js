@@ -6,8 +6,7 @@ const mongoDB = require('../controllers/checklist');
 
 // item 요청(POST)
 router.post('/', async (req, res) => {
-  const data = await mongoDB.getItem(req.body);
-  // console.log(req.body);
+  const data = await mongoDB.postItem(req.body);
   res.send(data);
 });
 
@@ -26,7 +25,6 @@ router.post('/checked', async (req, res) => {
 // checked 삭제(DELETE)
 router.delete('/deleteItem', async (req, res) => {
   const data = await mongoDB.deleteItem(req.body);
-  // console.log(req.body);
   res.send(data);
 });
 
