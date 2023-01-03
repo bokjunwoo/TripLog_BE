@@ -139,7 +139,11 @@ const userDB = {
         chargeList: [],
       });
       // 만들어진 회원 정보에 따른 체크리스트 저장
-      const checkInsert = await checkdb.insertOne(initCheckState)
+      const checkInsert = await checkdb.insertOne({
+        nickName : registerInfo.nickName,
+        checked : initCheckState.checked,
+        items : initCheckState.items
+      })
 
       // 정보 처리가 완료되면 회원 가입 성공 여부 전달
       if (result.acknowledged && chargeInsert.acknowledged && checkInsert.acknowledged) {
