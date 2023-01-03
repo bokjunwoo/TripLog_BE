@@ -6,7 +6,7 @@ const checkDB = {
   // item 요청(POST)
   postItem: async ({ nickName }) => {
     const client = await _client;
-    const db = client.db('triplog').collection('checklist');
+    const db = client.db('TripLogV2').collection('checklist');
     const data = await db.findOne({ nickName: nickName });
     return data;
   },
@@ -14,7 +14,7 @@ const checkDB = {
   // item 추가(POST)
   addItem: async (item) => {
     const client = await _client;
-    const db = client.db('triplog').collection('checklist');
+    const db = client.db('TripLogV2').collection('checklist');
     const result = await db.updateOne(
       { nickName: item.nickName, 'items.title': item.title },
       {
@@ -33,7 +33,7 @@ const checkDB = {
   // checked 변경(POST)
   checkedItem: async (el) => {
     const client = await _client;
-    const db = client.db('triplog').collection('checklist');
+    const db = client.db('TripLogV2').collection('checklist');
     const result = await db.updateOne(
       { nickName: el.nickName },
       { $set: { checked: el.checked } }
@@ -48,7 +48,7 @@ const checkDB = {
   // checked 삭제(DELETE)
   deleteItem: async (el) => {
     const client = await _client;
-    const db = client.db('triplog').collection('checklist');
+    const db = client.db('TripLogV2').collection('checklist');
     const result = await db.updateOne(
       { nickName: el.nickName, 'items.title': el.title },
       { $pull: { 'items.$.content': el.item } }

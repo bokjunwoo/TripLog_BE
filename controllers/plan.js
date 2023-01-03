@@ -7,7 +7,7 @@ const planDB = {
   // 여행 저장(POST)
   savePlan: async (list) => {
     const client = await _client;
-    const db = client.db('triplog').collection('plans');
+    const db = client.db('TripLogV2').collection('plan');
     const plan = await db.insertOne(list);
     if (plan.acknowledged) {
       return true;

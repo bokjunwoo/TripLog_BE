@@ -60,11 +60,11 @@ const verifyPassword = (password, salt, userPassword) => {
   return false;
 };
 
-const usersDB = {
+const userDB = {
   // 회원가입 아이디 중복확인(POST)
   idCheck: async (registerId) => {
     const client = await _client;
-    const userdb = client.db('triplog').collection('users');
+    const userdb = client.db('TripLogV2').collection('user');
     const idCheck = await userdb.findOne({ email: registerId.email });
 
     if (idCheck === null) {
@@ -81,7 +81,7 @@ const usersDB = {
   // 회원가입 닉네임 중복확인(POST)
   nameCheck: async (registerName) => {
     const client = await _client;
-    const userdb = client.db('triplog').collection('users');
+    const userdb = client.db('TripLogV2').collection('user');
     const nameCheck = await userdb.findOne({ email: registerName.nickName });
 
     if (nameCheck === null) {
@@ -98,9 +98,9 @@ const usersDB = {
   // 회원 가입 모듈(POST)
   register: async (registerInfo) => {
     const client = await _client;
-    const userdb = client.db('triplog').collection('users');
-    const chargedb = client.db('triplog').collection('charge');
-    const checkdb = client.db('triplog').collection('checklist');
+    const userdb = client.db('TripLogV2').collection('user');
+    const chargedb = client.db('TripLogV2').collection('charge');
+    const checkdb = client.db('TripLogV2').collection('checklist');
     // 동일한 Email 이 DB에 있는지 체크
     const duplicated = await userdb.findOne({ email: registerInfo.email });
     
@@ -156,7 +156,7 @@ const usersDB = {
   // 로그인(POST)
   login: async (loginInfo) => {
     const client = await _client;
-    const userdb = client.db('triplog').collection('users');
+    const userdb = client.db('TripLogV2').collection('user');
     // 로그인 시 입력한 email 정보가 db 에 있는지 체크
     const findID = await userdb.findOne({ email: loginInfo.email });
     // db에 email 이 있으면, 비밀 번호 확인 후 로그인 처리
@@ -194,7 +194,7 @@ const usersDB = {
   // 유저 이미지 업로드(POST)
   updateImage: async (user) => {
     const client = await _client;
-    const userdb = client.db('triplog').collection('users');
+    const userdb = client.db('TripLogV2').collection('user');
 
     const nickName = user[0].nickName;
     const image = user[0].image;
@@ -212,4 +212,4 @@ const usersDB = {
   },
 };
 
-module.exports = usersDB;
+module.exports = userDB;

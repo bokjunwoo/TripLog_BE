@@ -6,7 +6,7 @@ const checkDB = {
   // 디테일 데이터(GET)
   getAlldetail: async (params) => {
     const client = await _client;
-    const db = client.db('triplog').collection(`${params.region}`);
+    const db = client.db('TripLogV2').collection(`${params.region}`);
     const data = await db.findOne({ contentid: `${params.contentid}` });
 
     // 조회수 +1
@@ -25,7 +25,7 @@ const checkDB = {
   // 해당 디테일 정보의 리뷰, 별점 데이터(GET)
   getEtcdetail: async (contentid) => {
     const client = await _client;
-    const db = client.db('triplog').collection('contentid');
+    const db = client.db('TripLogV2').collection('like');
     const data = await db.findOne({ contentid: contentid });
     return data;
   },

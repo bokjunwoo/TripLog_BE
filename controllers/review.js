@@ -8,7 +8,7 @@ const reviewDB = {
   // 디테일페이지 리뷰 요청(GET)
   getReview: async (contentid) => {
     const client = await _client;
-    const db = client.db('triplog').collection('review');
+    const db = client.db('TripLogV2').collection('review');
 
     const data = await db
       .find({ contentid: contentid })
@@ -20,8 +20,8 @@ const reviewDB = {
   // 리뷰 작성(POST)
   postSaveReview: async (review) => {
     const client = await _client;
-    const reviewdb = client.db('triplog').collection('review');
-    const regiondb = client.db('triplog').collection(`${review[0].region}`);
+    const reviewdb = client.db('TripLogV2').collection('review');
+    const regiondb = client.db('TripLogV2').collection(`${review[0].region}`);
 
     const contentid = review[0].contentid;
     const title = review[0].title;
@@ -69,7 +69,7 @@ const reviewDB = {
   // 리뷰 수정(GET)
   getEmendReview: async (_id) => {
     const client = await _client;
-    const db = client.db('triplog').collection('review');
+    const db = client.db('TripLogV2').collection('review');
     const data = await db.findOne({ _id: ObjectId(_id) });
     return data;
   },
@@ -81,7 +81,7 @@ const reviewDB = {
     const nickName = emendData[0].nickName;
 
     const client = await _client;
-    const db = client.db('triplog').collection('review');
+    const db = client.db('TripLogV2').collection('review');
     const data = await db.updateOne(
       { _id: ObjectId(contentId), nickName: nickName },
       {
@@ -101,8 +101,8 @@ const reviewDB = {
   // 리뷰 삭제(DELETE)
   deleteReview: async (review) => {
     const client = await _client;
-    const reviewdb = client.db('triplog').collection('review');
-    const regiondb = client.db('triplog').collection(`${review[0].region}`);
+    const reviewdb = client.db('TripLogV2').collection('review');
+    const regiondb = client.db('TripLogV2').collection(`${review[0].region}`);
 
     const reviewData = await reviewdb.deleteOne({
       _id: ObjectId(review[0]._id),

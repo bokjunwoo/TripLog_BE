@@ -6,7 +6,7 @@ const apiDB = {
   // 전체 데이터 저장(POST)
   postAlldata: async (data) => {
     const client = await _client;
-    const db = client.db('triplog').collection('');
+    const db = client.db('TripLogV2').collection('');
 
     for (let i = 0; i < data.length; i++) {
       const contentid = data[i].contentid;
@@ -46,7 +46,7 @@ const apiDB = {
   // contentid, like 저장(POST)
   postEtcdata: async (data) => {
     const client = await _client;
-    const db = client.db('triplog').collection('contentid');
+    const db = client.db('TripLogV2').collection('contentid');
 
     for (let i = 0; i < data.length; i++) {
       const contentid = data[i].contentid;

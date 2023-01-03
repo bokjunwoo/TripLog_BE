@@ -7,13 +7,13 @@ const likeDB = {
   likeIncPlus: async (data) => {
     const client = await _client;
     
-    const reviewData = client.db('triplog').collection(`${data.region}`);
+    const reviewData = client.db('TripLogV2').collection(`${data.region}`);
     const likePlus = await reviewData.updateOne(
       { contentid: data.contentid },
       { $inc: { like: +1 } }
     );
 
-    const likeData = client.db('triplog').collection('contentid');
+    const likeData = client.db('TripLogV2').collection('like');
     const likeInc =  await likeData.updateOne(
       { contentid: data.contentid },
       { $inc: { like: +1 } }
@@ -34,13 +34,13 @@ const likeDB = {
   likeIncMinus: async (data) => {
     const client = await _client;
     
-    const reviewData = client.db('triplog').collection(`${data.region}`);
+    const reviewData = client.db('TripLogV2').collection(`${data.region}`);
     const likePlus = await reviewData.updateOne(
       { contentid: data.contentid },
       { $inc: { like: -1 } }
     );
 
-    const likeData = client.db('triplog').collection('contentid');
+    const likeData = client.db('TripLogV2').collection('like');
     const likeInc =  await likeData.updateOne(
       { contentid: data.contentid },
       { $inc: { like: -1 } }

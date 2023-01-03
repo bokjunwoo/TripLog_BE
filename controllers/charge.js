@@ -6,7 +6,7 @@ const chargeDB = {
   // 금액 요청(POST)
   postCharge: async ({ nickName }) => {
     const client = await _client;
-    const db = client.db('triplog').collection('charge');
+    const db = client.db('TripLogV2').collection('charge');
     const data = await db.findOne({ nickName: nickName });
     return data;
   },
@@ -14,7 +14,7 @@ const chargeDB = {
   // 금액 추가(POST)
   saveCharge: async (data) => {
     const client = await _client;
-    const db = client.db('triplog').collection('charge');
+    const db = client.db('TripLogV2').collection('charge');
     const charge = await db.updateOne(
       { nickName: data.nickName },
       {
@@ -34,7 +34,7 @@ const chargeDB = {
   // 금액 삭제(POST)
   deleteCharge: async (data) => {
     const client = await _client;
-    const db = client.db('triplog').collection('charge');
+    const db = client.db('TripLogV2').collection('charge');
     const charge = await db.updateOne(
       { nickName: data.nickName },
       {
@@ -52,7 +52,7 @@ const chargeDB = {
   // 금액 초기화(POST)
   deleteAll: async (data) => {
     const client = await _client;
-    const db = client.db('triplog').collection('charge');
+    const db = client.db('TripLogV2').collection('charge');
     const charge = await db.updateOne(
       { nickName: data.nickName },
       {
