@@ -110,7 +110,11 @@ const reviewDB = {
 
     const regionData = await regiondb.updateOne(
       { contentid: review[0].contentid },
-      { $pull: { star: { star: review[0].star, writeTime: review[0].writeTime } } }
+      {
+        $pull: {
+          star: { star: review[0].star, writeTime: review[0].writeTime },
+        },
+      }
     );
 
     if (reviewData.acknowledged && regionData.acknowledged) {
