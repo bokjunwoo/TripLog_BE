@@ -4,35 +4,37 @@ const _client = mongoClient.connect();
 
 // 체크리스트 기본 설정 값
 const initCheckState = {
-  checked: [],
-  items: [
+  content: [
     {
-      title: '기본 짐싸기',
-      content: [
-        '의류',
-        '전자기기 챙기기',
-        '세안용품',
-        '상비약',
-        '신분증/면허증',
-        '필기구',
-        '마스크/손 소독제',
+      title: '기본 준비물',
+      items: [
+        { item: '의류', checked: false },
+        { item: '세안용품', checked: false },
+        { item: '상비약', checked: false },
+        { item: '마스크', checked: false },
       ],
     },
     {
       title: '필수 준비물',
-      content: ['숙소'],
+      items: [{ item: '숙소', checked: false }],
     },
     {
       title: '트립로그에서 챙기기',
-      content: ['여행 일정짜기', '가계부 짜기'],
+      items: [
+        { item: '여행 계획짜기', checked: false },
+        { item: '가계부 작성', checked: false },
+      ],
     },
     {
       title: '통신/교통 준비',
-      content: ['여행지 교통편'],
+      items: [{ item: '여행지 교통편', checked: false }],
     },
     {
       title: '즐길거리 준비',
-      content: ['관광 정보 확인하기', '맛집 정보 확인하기'],
+      items: [
+        { item: '관광 정보 확인하기', checked: false },
+        { item: '맛집 정보 확인하기', checked: false },
+      ],
     },
   ],
 };
