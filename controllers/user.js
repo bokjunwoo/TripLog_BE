@@ -69,11 +69,11 @@ const userDB = {
 
     if (idCheck === null) {
       return {
-        idCheck: true,
+        idCheck: false,
       };
     } else {
       return {
-        idCheck: false,
+        idCheck: true,
       };
     }
   },
@@ -82,15 +82,15 @@ const userDB = {
   nameCheck: async (registerName) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
-    const nameCheck = await userdb.findOne({ email: registerName.nickName });
+    const nameCheck = await userdb.findOne({ nickname: registerName.nickname });
 
     if (nameCheck === null) {
       return {
-        nameCheck: true,
+        nameCheck: false,
       };
     } else {
       return {
-        nameCheck: false,
+        nameCheck: true,
       };
     }
   },
@@ -101,59 +101,76 @@ const userDB = {
     const userdb = client.db('TripLogV2').collection('user');
     const chargedb = client.db('TripLogV2').collection('charge');
     const checkdb = client.db('TripLogV2').collection('checklist');
-    // 동일한 Email 이 DB에 있는지 체크
-    const duplicated = await userdb.findOne({ email: registerInfo.email });
-    
-    // 동일한 Email 이 있으면 회원 가입 실패 -> 해당 문구 안내
-    if (duplicated) {
+
+    const duplicatedEmail = await userdb.findOne({ email: registerInfo.email });
+
+    if (duplicatedEmail) {
       return {
         duplicated: true,
-        msg: '중복 회원 존재',
+        message: '중복된 이메일이 존재해 실패하였습니다.',
+        status: 404,
+      };
+    }
+
+    const duplicatedNickname = await userdb.findOne({
+      email: registerInfo.nickname,
+    });
+
+    if (duplicatedNickname) {
+      return {
+        duplicated: true,
+        message: '중복된 닉네임이 존재해 실패하였습니다.',
+        status: 404,
+      };
+    }
+
+    let registerUser = {};
+
+    if (registerInfo.type === 'local') {
+      const hash = createHashedPassword(registerInfo.password);
+
+      registerUser = {
+        type: registerInfo.type,
+        email: registerInfo.email,
+        nickname: registerInfo.nickname,
+        password: hash.hashedPassword,
+        salt: hash.salt,
+        image: '',
       };
     } else {
-      let registerUser = {};
-      if (registerInfo.type === 'local') {
-        const hash = createHashedPassword(registerInfo.password);
-        registerUser = {
-          type: registerInfo.type,
-          email: registerInfo.email,
-          nickName: registerInfo.nickName,
-          password: hash.hashedPassword,
-          salt: hash.salt,
-          image: '',
-        };
-      } else {
-        registerUser = {
-          type: registerInfo.type,
-          email: registerInfo.email,
-          nickName: registerInfo.nickName,
-          image: registerInfo.image,
-        };
-      }
+      registerUser = {
+        type: registerInfo.type,
+        email: registerInfo.email,
+        nickname: registerInfo.nickname,
+        image: registerInfo.image,
+      };
+    }
 
-      // 만들어진 회원 가입 정보 DB에 저장
-      const result = await userdb.insertOne(registerUser);
-      // 만들어진 회원 정보에 따른 가계부 저장
-      const chargeInsert = await chargedb.insertOne({
-        nickName: registerInfo.nickName,
-        chargeList: [],
-      });
-      // 만들어진 회원 정보에 따른 체크리스트 저장
-      const checkInsert = await checkdb.insertOne({
-        nickName : registerInfo.nickName,
-        checked : initCheckState.checked,
-        items : initCheckState.items
-      })
+    const result = await userdb.insertOne(registerUser);
 
-      // 정보 처리가 완료되면 회원 가입 성공 여부 전달
-      if (result.acknowledged && chargeInsert.acknowledged && checkInsert.acknowledged) {
-        return {
-          duplicated: false,
-          msg: '회원 가입 성공! 로그인 페이지로 이동 합니다.',
-        };
-      } else {
-        throw new Error('통신 이상');
-      }
+    const chargeInsert = await chargedb.insertOne({
+      nickname: registerInfo.nickname,
+      chargeList: [],
+    });
+
+    const checkInsert = await checkdb.insertOne({
+      nickname: registerInfo.nickname,
+      checked: initCheckState.checked,
+      items: initCheckState.items,
+    });
+
+    if (
+      result.acknowledged &&
+      chargeInsert.acknowledged &&
+      checkInsert.acknowledged
+    ) {
+      return {
+        duplicated: false,
+        message: '회원 가입이 완료되었습니다.',
+        status: 201,
+      };
+    } else {
+      throw new Error('통신 이상');
     }
   },
 
@@ -171,12 +188,12 @@ const userDB = {
         findID.password
       );
 
-      // 비밀 번호 일치 여부를 토대로 로그인 처리      
+      // 비밀 번호 일치 여부를 토대로 로그인 처리
       if (passwordCheckResult) {
         return {
           result: true,
           email: findID.email,
-          nickName: findID.nickName,
+          nickname: findID.nickname,
           image: findID.image,
           msg: '로그인 성공! 메인 페이지로 이동 합니다.',
         };
@@ -200,11 +217,11 @@ const userDB = {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
 
-    const nickName = user[0].nickName;
+    const nickname = user[0].nickname;
     const image = user[0].image;
 
     const updataRes = await userdb.updateOne(
-      { nickName: nickName },
+      { nickname: nickname },
       { $set: { image: image } }
     );
 
