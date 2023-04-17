@@ -29,6 +29,10 @@ const apiRouter = require('./routes/apiRouter');
 app.use('/api', apiRouter);
 */
 
+app.get('/', (req, res) => {
+  res.status(200).send('Hello, world!');
+});
+
 /* image 저장 위치 */
 app.use('/uploads', express.static('uploads'));
 
