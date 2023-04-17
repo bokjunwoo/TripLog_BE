@@ -108,9 +108,9 @@ const userDB = {
 
     if (duplicatedEmail) {
       return {
-        duplicated: true,
+        type: 'register',
         message: '중복된 이메일이 존재해 실패하였습니다.',
-        status: 404,
+        success: false,
       };
     }
 
@@ -120,9 +120,9 @@ const userDB = {
 
     if (duplicatedNickname) {
       return {
-        duplicated: true,
+        type: 'register',
         message: '중복된 닉네임이 존재해 실패하였습니다.',
-        status: 404,
+        success: false,
       };
     }
 
@@ -167,9 +167,9 @@ const userDB = {
       checkInsert.acknowledged
     ) {
       return {
-        duplicated: false,
+        type: 'register',
         message: '회원 가입이 완료되었습니다.',
-        status: 201,
+        success: true,
       };
     } else {
       throw new Error('통신 이상');
@@ -181,35 +181,30 @@ const userDB = {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
     // 로그인 시 입력한 email 정보가 db 에 있는지 체크
-    const findID = await userdb.findOne({ email: loginInfo.email });
-    // db에 email 이 있으면, 비밀 번호 확인 후 로그인 처리
-    if (findID) {
-      const passwordCheckResult = verifyPassword(
-        loginInfo.password,
-        findID.salt,
-        findID.password
-      );
+    const user = await userdb.findOne({ email: loginInfo.email });
 
-      // 비밀 번호 일치 여부를 토대로 로그인 처리
-      if (passwordCheckResult) {
-        return {
-          result: true,
-          email: findID.email,
-          nickname: findID.nickname,
-          image: findID.image,
-          msg: '로그인 성공! 메인 페이지로 이동 합니다.',
-        };
-      } else {
-        return {
-          result: false,
-          msg: '비밀 번호가 틀립니다',
-        };
-      }
-    } else {
-      // db에 email 이 없으면 없다고 안내, 로그인 실패
+    if (!user) {
       return {
-        result: false,
-        msg: '해당 E-Mail 을 찾을 수 없습니다!',
+        type: 'login',
+        success: false,
+        message: '해당 아이디를 찾을 수 없습니다.',
+      };
+    }
+
+    const passwordCheckResult = verifyPassword(
+      loginInfo.password,
+      user.salt,
+      user.password
+    );
+
+    if (passwordCheckResult) {
+      // const { email, nickname, image } = user;
+      return { type: 'login', success: true, message: '로그인 되었습니다.' };
+    } else {
+      return {
+        type: 'login',
+        success: false,
+        message: '비밀 번호가 틀립니다.',
       };
     }
   },
