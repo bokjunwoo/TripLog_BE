@@ -162,7 +162,7 @@ const userDB = {
       checkInsert.acknowledged
     ) {
       return {
-        type: 'register',
+        type: 'signup',
         message: '회원 가입이 완료되었습니다.',
         success: true,
       };
@@ -215,9 +215,10 @@ const userDB = {
       checkInsert.acknowledged
     ) {
       return {
-        type: 'signup',
+        type: 'login',
         success: true,
-        message: '회원 가입이 완료되었습니다.',
+        message: '로그인이 완료되었습니다.',
+        nickname: userdb.nickname
       };
     } else {
       throw new Error('통신 이상');
@@ -246,8 +247,12 @@ const userDB = {
     );
 
     if (passwordCheckResult) {
-      // const { email, nickname, image } = user;
-      return { type: 'login', success: true, message: '로그인 되었습니다.' };
+      return {
+        type: 'login',
+        success: true,
+        message: '로그인 되었습니다.',
+        nickname: user.nickname,
+      };
     } else {
       return {
         type: 'login',
@@ -269,14 +274,15 @@ const userDB = {
         type: 'login',
         success: true,
         message: '카카오 로그인이 성공했습니다.',
+        nickname: user.nickname
       };
     }
 
     if (!user) {
       return {
-        type: 'login',
+        type: 'signup',
         success: true,
-        message: '회원가입이 완료되었습니다.',
+        message: '닉네임 정보가 필요합니다.',
       };
     }
   },
