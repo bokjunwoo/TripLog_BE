@@ -3,7 +3,7 @@ const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
 // 체크리스트 기본 설정 값
-const initCheckState = {
+const checklist = {
   content: [
     {
       title: '기본 준비물',
@@ -153,8 +153,7 @@ const userDB = {
 
     const checkInsert = await checkdb.insertOne({
       nickname: registerInfo.nickname,
-      checked: initCheckState.checked,
-      items: initCheckState.items,
+      items: checklist,
     });
 
     if (
@@ -207,8 +206,7 @@ const userDB = {
 
     const checkInsert = await checkdb.insertOne({
       nickname: registerInfo.nickname,
-      checked: initCheckState.checked,
-      items: initCheckState.items,
+      items: checklist,
     });
 
     if (
