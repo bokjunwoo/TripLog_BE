@@ -63,6 +63,13 @@ const verifyPassword = (password, salt, userPassword) => {
 };
 
 const userDB = {
+  user: async () => {
+    const client = await _client;
+    const userdb = client.db('TripLogV2').collection('user');
+    const user = await userdb.findOne({ email: registerId.email });
+
+    return user;
+  },
   // 회원가입 아이디 중복확인(POST)
   idCheck: async (registerId) => {
     const client = await _client;
@@ -97,7 +104,7 @@ const userDB = {
     }
   },
 
-  // 회원 가입 모듈(POST)
+  // 로컬 회원 가입 모듈(POST)
   register: async (registerInfo) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
@@ -108,45 +115,34 @@ const userDB = {
 
     if (duplicatedEmail) {
       return {
-        type: 'register',
+        type: 'signup',
         message: '중복된 이메일이 존재해 실패하였습니다.',
         success: false,
       };
     }
 
     const duplicatedNickname = await userdb.findOne({
-      email: registerInfo.nickname,
+      nickname: registerInfo.nickname,
     });
 
     if (duplicatedNickname) {
       return {
-        type: 'register',
+        type: 'signup',
         message: '중복된 닉네임이 존재해 실패하였습니다.',
         success: false,
       };
     }
 
-    let registerUser = {};
+    const hash = createHashedPassword(registerInfo.password);
 
-    if (registerInfo.type === 'local') {
-      const hash = createHashedPassword(registerInfo.password);
-
-      registerUser = {
-        type: registerInfo.type,
-        email: registerInfo.email,
-        nickname: registerInfo.nickname,
-        password: hash.hashedPassword,
-        salt: hash.salt,
-        image: '',
-      };
-    } else {
-      registerUser = {
-        type: registerInfo.type,
-        email: registerInfo.email,
-        nickname: registerInfo.nickname,
-        image: registerInfo.image,
-      };
-    }
+    const registerUser = {
+      type: registerInfo.type,
+      email: registerInfo.email,
+      nickname: registerInfo.nickname,
+      password: hash.hashedPassword,
+      salt: hash.salt,
+      image: '',
+    };
 
     const result = await userdb.insertOne(registerUser);
 
@@ -176,8 +172,62 @@ const userDB = {
     }
   },
 
+  // 카카오 회원 가입 모듈
+  kakaoInit: async (registerInfo) => {
+    const client = await _client;
+    const userdb = client.db('TripLogV2').collection('user');
+    const chargedb = client.db('TripLogV2').collection('charge');
+    const checkdb = client.db('TripLogV2').collection('checklist');
+
+    const duplicatedNickname = await userdb.findOne({
+      nickname: registerInfo.nickname,
+    });
+
+    if (duplicatedNickname) {
+      return {
+        type: 'signup',
+        success: false,
+        message: '중복된 닉네임이 존재해 실패하였습니다.',
+      };
+    }
+
+    const registerUser = {
+      type: registerInfo.type,
+      id: registerInfo.id,
+      nickname: registerInfo.nickname,
+      image: '',
+    };
+
+    const result = await userdb.insertOne(registerUser);
+
+    const chargeInsert = await chargedb.insertOne({
+      nickname: registerInfo.nickname,
+      chargeList: [],
+    });
+
+    const checkInsert = await checkdb.insertOne({
+      nickname: registerInfo.nickname,
+      checked: initCheckState.checked,
+      items: initCheckState.items,
+    });
+
+    if (
+      result.acknowledged &&
+      chargeInsert.acknowledged &&
+      checkInsert.acknowledged
+    ) {
+      return {
+        type: 'signup',
+        success: true,
+        message: '회원 가입이 완료되었습니다.',
+      };
+    } else {
+      throw new Error('통신 이상');
+    }
+  },
+
   // 로그인(POST)
-  login: async (loginInfo) => {
+  local: async (loginInfo) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
     // 로그인 시 입력한 email 정보가 db 에 있는지 체크
@@ -205,6 +255,30 @@ const userDB = {
         type: 'login',
         success: false,
         message: '비밀 번호가 틀립니다.',
+      };
+    }
+  },
+
+  // 로그인(POST)
+  kakao: async (loginInfo) => {
+    const client = await _client;
+    const userdb = client.db('TripLogV2').collection('user');
+    // 로그인 시 입력한 email 정보가 db 에 있는지 체크
+    const user = await userdb.findOne({ id: loginInfo.id });
+
+    if (user) {
+      return {
+        type: 'login',
+        success: true,
+        message: '카카오 로그인이 성공했습니다.',
+      };
+    }
+
+    if (!user) {
+      return {
+        type: 'login',
+        success: true,
+        message: '회원가입이 완료되었습니다.',
       };
     }
   },
