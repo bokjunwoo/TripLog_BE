@@ -15,8 +15,9 @@ const listDB = {
       .skip(skipIndex)
       .limit(limit)
       .toArray();
-    const total = await db.find({ type: `${query.type}` }).count();
-    return {data, total};
+    const total = await db.countDocuments({ type: query.type });
+
+    return { data, total };
   },
 };
 
