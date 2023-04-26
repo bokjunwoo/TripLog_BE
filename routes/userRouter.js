@@ -41,30 +41,29 @@ router.post('/register/namecheck', async (req, res) => {
 
 // 로컬 회원 가입 모듈(POST)
 router.post('/localregister', async (req, res) => {
-  const registerInfo = req.body;
-  const result = await mongoDB.register(registerInfo);
+  const localregister = req.body;
+  const result = await mongoDB.localRegister(localregister);
   res.send(JSON.stringify(result));
 });
 
 // 카카오 회원 가입 모듈(POST)
 router.post('/kakaoregister', async (req, res) => {
-  console.log(req.body);
-  const registerInfo = req.body;
-  const result = await mongoDB.kakaoInit(registerInfo);
+  const kakaoRegister = req.body;
+  const result = await mongoDB.kakaoRegister(kakaoRegister);
   res.send(JSON.stringify(result));
 });
 
 // 로컬로그인(POST)
 router.post('/local', async (req, res) => {
-  const loginInfo = req.body;
-  const result = await mongoDB.local(loginInfo);
+  const localLogin = req.body.data;
+  const result = await mongoDB.localLogin(localLogin);
   res.send(JSON.stringify(result));
 });
 
 // 카카오로그인(POST)
 router.post('/kakao', async (req, res) => {
-  const loginInfo = req.body;
-  const result = await mongoDB.kakao(loginInfo);
+  const kakaoLogin = req.body.data;
+  const result = await mongoDB.kakaoLogin(kakaoLogin);
   res.send(JSON.stringify(result));
 });
 

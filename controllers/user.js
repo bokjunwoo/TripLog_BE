@@ -105,13 +105,18 @@ const userDB = {
   },
 
   // 로컬 회원 가입 모듈(POST)
-  register: async (registerInfo) => {
+  localRegister: async (localRegister) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
     const chargedb = client.db('TripLogV2').collection('charge');
     const checkdb = client.db('TripLogV2').collection('checklist');
 
-    const duplicatedEmail = await userdb.findOne({ email: registerInfo.email });
+    const localregisterType = localRegister.type;
+    const localregisterData = localRegister.data;
+
+    const duplicatedEmail = await userdb.findOne({
+      email: localregisterData.email,
+    });
 
     if (duplicatedEmail) {
       return {
@@ -122,7 +127,7 @@ const userDB = {
     }
 
     const duplicatedNickname = await userdb.findOne({
-      nickname: registerInfo.nickname,
+      nickname: localregisterData.nickname,
     });
 
     if (duplicatedNickname) {
@@ -133,12 +138,12 @@ const userDB = {
       };
     }
 
-    const hash = createHashedPassword(registerInfo.password);
+    const hash = createHashedPassword(localregisterData.password);
 
     const registerUser = {
-      type: registerInfo.type,
-      email: registerInfo.email,
-      nickname: registerInfo.nickname,
+      type: localregisterType,
+      email: localregisterData.email,
+      nickname: localregisterData.nickname,
       password: hash.hashedPassword,
       salt: hash.salt,
       image: '',
@@ -147,12 +152,12 @@ const userDB = {
     const result = await userdb.insertOne(registerUser);
 
     const chargeInsert = await chargedb.insertOne({
-      nickname: registerInfo.nickname,
+      nickname: localregisterData.nickname,
       chargeList: [],
     });
 
     const checkInsert = await checkdb.insertOne({
-      nickname: registerInfo.nickname,
+      nickname: localregisterData.nickname,
       items: checklist,
     });
 
@@ -172,14 +177,17 @@ const userDB = {
   },
 
   // 카카오 회원 가입 모듈
-  kakaoInit: async (registerInfo) => {
+  kakaoRegister: async (kakaoRegister) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
     const chargedb = client.db('TripLogV2').collection('charge');
     const checkdb = client.db('TripLogV2').collection('checklist');
 
+    const kakaoRegisterType = kakaoRegister.type;
+    const kakaoRegisterData = kakaoRegister.data;
+
     const duplicatedNickname = await userdb.findOne({
-      nickname: registerInfo.nickname,
+      nickname: kakaoRegisterData.nickname,
     });
 
     if (duplicatedNickname) {
@@ -191,21 +199,21 @@ const userDB = {
     }
 
     const registerUser = {
-      type: registerInfo.type,
-      id: registerInfo.id,
-      nickname: registerInfo.nickname,
+      type: kakaoRegisterType,
+      id: kakaoRegisterData.id,
+      nickname: kakaoRegisterData.nickname,
       image: '',
     };
 
     const result = await userdb.insertOne(registerUser);
 
     const chargeInsert = await chargedb.insertOne({
-      nickname: registerInfo.nickname,
+      nickname: kakaoRegisterData.nickname,
       chargeList: [],
     });
 
     const checkInsert = await checkdb.insertOne({
-      nickname: registerInfo.nickname,
+      nickname: kakaoRegisterData.nickname,
       items: checklist,
     });
 
@@ -218,7 +226,7 @@ const userDB = {
         type: 'login',
         success: true,
         message: '로그인이 완료되었습니다.',
-        nickname: userdb.nickname
+        nickname: kakaoRegisterData.nickname,
       };
     } else {
       throw new Error('통신 이상');
@@ -226,11 +234,11 @@ const userDB = {
   },
 
   // 로그인(POST)
-  local: async (loginInfo) => {
+  localLogin: async (localLogin) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
     // 로그인 시 입력한 email 정보가 db 에 있는지 체크
-    const user = await userdb.findOne({ email: loginInfo.email });
+    const user = await userdb.findOne({ email: localLogin.email });
 
     if (!user) {
       return {
@@ -241,7 +249,7 @@ const userDB = {
     }
 
     const passwordCheckResult = verifyPassword(
-      loginInfo.password,
+      localLogin.password,
       user.salt,
       user.password
     );
@@ -263,18 +271,18 @@ const userDB = {
   },
 
   // 로그인(POST)
-  kakao: async (loginInfo) => {
+  kakaoLogin: async (kakaoLogin) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
     // 로그인 시 입력한 email 정보가 db 에 있는지 체크
-    const user = await userdb.findOne({ id: loginInfo.id });
+    const user = await userdb.findOne({ id: kakaoLogin.id });
 
     if (user) {
       return {
         type: 'login',
         success: true,
         message: '카카오 로그인이 성공했습니다.',
-        nickname: user.nickname
+        nickname: user.nickname,
       };
     }
 
