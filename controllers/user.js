@@ -234,43 +234,6 @@ const userDB = {
   },
 
   // 로그인(POST)
-  localLogin: async (localLogin) => {
-    const client = await _client;
-    const userdb = client.db('TripLogV2').collection('user');
-    // 로그인 시 입력한 email 정보가 db 에 있는지 체크
-    const user = await userdb.findOne({ email: localLogin.email });
-
-    if (!user) {
-      return {
-        type: 'login',
-        success: false,
-        message: '해당 아이디를 찾을 수 없습니다.',
-      };
-    }
-
-    const passwordCheckResult = verifyPassword(
-      localLogin.password,
-      user.salt,
-      user.password
-    );
-
-    if (passwordCheckResult) {
-      return {
-        type: 'login',
-        success: true,
-        message: '로그인 되었습니다.',
-        nickname: user.nickname,
-      };
-    } else {
-      return {
-        type: 'login',
-        success: false,
-        message: '비밀 번호가 틀립니다.',
-      };
-    }
-  },
-
-  // 로그인(POST)
   kakaoLogin: async (kakaoLogin) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');

@@ -7,6 +7,7 @@ const mongoDB = require('../controllers/user');
 const multer = require('multer');
 
 const fs = require('fs');
+const passport = require('passport');
 
 const dir = './uploads';
 
@@ -53,12 +54,28 @@ router.post('/kakaoregister', async (req, res) => {
   res.send(JSON.stringify(result));
 });
 
-// 로컬로그인(POST)
-router.post('/local', async (req, res) => {
-  const localLogin = req.body.data;
-  const result = await mongoDB.localLogin(localLogin);
-  res.send(JSON.stringify(result));
+router.post('/local', (req, res) => {
+  passport.authenticate('local', (err, user, info) => {
+    console.log(err, info, user);
+    if (err) return console.error(err);
+    if (info) return res.send(info);
+    return req.login(user, async (loginErr) => {
+      if (loginErr) return console.error(loginErr);
+      return res.json({
+        type: 'login',
+        success: true,
+        message: '로그인 되었습니다.',
+        nickname: user.nickname,
+      });
+    });
+  })(req, res);
 });
+// // 로컬로그인(POST)
+// router.post('/local', async (req, res) => {
+//   const localLogin = req.body.data;
+//   const result = await mongoDB.localLogin(localLogin);
+//   res.send(JSON.stringify(result));
+// });
 
 // 카카오로그인(POST)
 router.post('/kakao', async (req, res) => {
