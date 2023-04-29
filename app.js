@@ -14,6 +14,20 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+/* passport */
+const passport = require('passport');
+const passportConfig = require('./passport');
+const session = require('express-session');
+
+passportConfig();
+
+app.use(session({
+  saveUninitialized: false,
+  resave: false,
+  secret: 'triplog',
+}));
+app.use(passport.session());
+
 /*
 // 데이터 저장하기 위해 전송 데이터 제한해제
 app.use(express.json({
