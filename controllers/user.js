@@ -63,13 +63,6 @@ const verifyPassword = (password, salt, userPassword) => {
 };
 
 const userDB = {
-  user: async () => {
-    const client = await _client;
-    const userdb = client.db('TripLogV2').collection('user');
-    const user = await userdb.findOne({ email: registerId.email });
-
-    return user;
-  },
   // 회원가입 아이디 중복확인(POST)
   idCheck: async (registerId) => {
     const client = await _client;
