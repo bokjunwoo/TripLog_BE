@@ -1,32 +1,37 @@
 const express = require('express');
+const cors = require('cors');
+const passport = require('passport');
+const session = require('express-session');
+const passportConfig = require('./passport/index');
+
+require('dotenv').config();
 
 const app = express();
 
-/* dotenv */
-require('dotenv').config();
-
-const PORT = 4000;
-
-/* cors */
-const cors = require('cors');
-app.use(cors());
+passportConfig();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 /* passport */
-const passport = require('passport');
-const passportConfig = require('./passport');
-const session = require('express-session');
-
-passportConfig();
-
-app.use(session({
-  saveUninitialized: false,
-  resave: false,
-  secret: 'triplog',
-}));
+app.use(
+  session({
+    secret: 'your-secret-key',
+    resave: true,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
 app.use(passport.session());
+
+/* cors */
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+const PORT = 4000;
 
 /*
 // 데이터 저장하기 위해 전송 데이터 제한해제
