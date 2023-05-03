@@ -26,6 +26,20 @@ const limits = {
 
 const upload = multer({ storage, limits });
 
+// 유저정보 반환
+router.get('/', async (req, res) => {
+  const userInfo = req.user;
+  try {
+    if (userInfo) {
+      res.send(JSON.stringify(userInfo.nickname));
+    } else {
+      res.send(JSON.stringify(null));
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 // 회원가입 아이디 중복확인(POST)
 router.post('/register/idcheck', async (req, res) => {
   const registerId = req.body;
@@ -54,28 +68,33 @@ router.post('/kakaoregister', async (req, res) => {
   res.send(JSON.stringify(result));
 });
 
-router.post('/local', (req, res) => {
+// 로컬 로그인(POST)
+router.post('/local', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
-    console.log(err, info, user);
-    if (err) return console.error(err);
-    if (info) return res.send(info);
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+
+    if (info) {
+      return res.send(info);
+    }
+
     return req.login(user, async (loginErr) => {
-      if (loginErr) return console.error(loginErr);
-      return res.json({
+      console.log('login 실행');
+      if (loginErr) {
+        console.error(loginErr);
+        return next(loginErr);
+      }
+      return res.send({
         type: 'login',
         success: true,
         message: '로그인 되었습니다.',
         nickname: user.nickname,
       });
     });
-  })(req, res);
+  })(req, res, next);
 });
-// // 로컬로그인(POST)
-// router.post('/local', async (req, res) => {
-//   const localLogin = req.body.data;
-//   const result = await mongoDB.localLogin(localLogin);
-//   res.send(JSON.stringify(result));
-// });
 
 // 카카오로그인(POST)
 router.post('/kakao', async (req, res) => {
