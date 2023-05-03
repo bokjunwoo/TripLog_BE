@@ -1,9 +1,7 @@
 const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
 const mongoClient = require('../routes/mongo');
-const userdb = mongoClient
-  .connect()
-  .then((client) => client.db('TripLogV2').collection('user'));
+
 const crypto = require('crypto');
 
 const verifyPassword = (password, salt, userPassword) => {
@@ -23,9 +21,10 @@ module.exports = () => {
         passwordField: 'password',
       },
       async (email, password, done) => {
-        console.log('email', email);
         try {
-          const user = await (await userdb).findOne({ email });
+          const client = await mongoClient.connect();
+          const userdb = client.db('TripLogV2').collection('user');
+          const user = await userdb.findOne({ email });
 
           if (!user) {
             return done(null, false, {
@@ -41,15 +40,14 @@ module.exports = () => {
             user.password
           );
 
-          if (passwordCheckResult) {
-            return done(null, user);
+          if (!passwordCheckResult) {
+            return done(null, false, {
+              type: 'login',
+              success: false,
+              message: '비밀 번호가 틀립니다.',
+            });
           }
-
-          return done(null, false, {
-            type: 'login',
-            success: false,
-            message: '비밀 번호가 틀립니다.',
-          });
+          return done(null, user);
         } catch (error) {
           console.error(error);
           return done(error);
