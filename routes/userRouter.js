@@ -4,6 +4,9 @@ const router = express.Router();
 
 const mongoDB = require('../controllers/user');
 
+const mongoClient = require('../routes/mongo');
+const _client = mongoClient.connect();
+
 const multer = require('multer');
 
 const fs = require('fs');
@@ -80,11 +83,10 @@ router.post('/local', (req, res, next) => {
       return res.send(info);
     }
 
-    return req.login(user, async (loginErr) => {
-      console.log('login 실행');
-      if (loginErr) {
-        console.error(loginErr);
-        return next(loginErr);
+    return req.login(user, async (error) => {
+      if (error) {
+        console.error(error);
+        return next(error);
       }
       return res.send({
         type: 'login',
@@ -97,10 +99,34 @@ router.post('/local', (req, res, next) => {
 });
 
 // 카카오로그인(POST)
-router.post('/kakao', async (req, res) => {
+router.post('/kakao', async (req, res, next) => {
   const kakaoLogin = req.body.data;
-  const result = await mongoDB.kakaoLogin(kakaoLogin);
-  res.send(JSON.stringify(result));
+
+  const client = await _client;
+  const userdb = client.db('TripLogV2').collection('user');
+  const user = await userdb.findOne({ id: kakaoLogin.id });
+
+  if (!user) {
+    return res.send({
+      type: 'signup',
+      success: true,
+      message: '닉네임 정보가 필요합니다.',
+    });
+  }
+
+  return req.login(user, async (error) => {
+    if (error) {
+      console.error(error);
+      return next(error);
+    }
+
+    return res.send({
+      type: 'login',
+      success: true,
+      message: '카카오 로그인이 성공했습니다.',
+      nickname: user.nickname,
+    });
+  });
 });
 
 // 유저 IMG(POST)
