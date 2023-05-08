@@ -7,6 +7,8 @@ const mongoDB = require('../controllers/user');
 const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
+const checklist = require('../data/checklist');
+
 const multer = require('multer');
 
 const fs = require('fs');
@@ -65,10 +67,69 @@ router.post('/localregister', async (req, res) => {
 });
 
 // 카카오 회원 가입 모듈(POST)
-router.post('/kakaoregister', async (req, res) => {
+router.post('/kakaoregister', async (req, res, next) => {
   const kakaoRegister = req.body;
-  const result = await mongoDB.kakaoRegister(kakaoRegister);
-  res.send(JSON.stringify(result));
+
+  const client = await _client;
+  const userdb = client.db('TripLogV2').collection('user');
+  const chargedb = client.db('TripLogV2').collection('charge');
+  const checkdb = client.db('TripLogV2').collection('checklist');
+
+  const kakaoRegisterType = kakaoRegister.type;
+  const kakaoRegisterData = kakaoRegister.data;
+
+  const duplicatedNickname = await userdb.findOne({
+    nickname: kakaoRegisterData.nickname,
+  });
+
+  if (duplicatedNickname) {
+    return {
+      type: 'signup',
+      success: false,
+      message: '중복된 닉네임이 존재해 실패하였습니다.',
+    };
+  }
+
+  const registerUser = {
+    type: kakaoRegisterType,
+    id: kakaoRegisterData.id,
+    nickname: kakaoRegisterData.nickname,
+    image: '',
+  };
+
+  const result = await userdb.insertOne(registerUser);
+
+  const chargeInsert = await chargedb.insertOne({
+    nickname: kakaoRegisterData.nickname,
+    chargeList: [],
+  });
+
+  const checkInsert = await checkdb.insertOne({
+    nickname: kakaoRegisterData.nickname,
+    items: checklist,
+  });
+
+  if (
+    result.acknowledged &&
+    chargeInsert.acknowledged &&
+    checkInsert.acknowledged
+  ) {
+    return req.login(registerUser, async (error) => {
+      if (error) {
+        console.error(error);
+        return next(error);
+      }
+
+      return res.send({
+        type: 'login',
+        success: true,
+        message: '로그인이 완료되었습니다.',
+        nickname: kakaoRegisterData.nickname,
+      });
+    });
+  } else {
+    throw new Error('통신 이상');
+  }
 });
 
 // 로컬 로그인(POST)
@@ -88,6 +149,7 @@ router.post('/local', (req, res, next) => {
         console.error(error);
         return next(error);
       }
+
       return res.send({
         type: 'login',
         success: true,
