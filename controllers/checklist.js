@@ -4,29 +4,48 @@ const _client = mongoClient.connect();
 
 const checkDB = {
   // item 요청(POST)
-  postItem: async ({ nickName }) => {
-    const client = await _client;
-    const db = client.db('TripLogV2').collection('checklist');
-    const data = await db.findOne({ nickName: nickName });
-    return data;
+  postItem: async (user) => {
+    try {
+      if (!user) {
+        return null;
+      }
+      const client = await _client;
+      const db = client.db('TripLogV2').collection('checklist');
+      const data = await db.findOne({ nickname: user.nickname });
+      return data;
+    } catch (error) {
+      console.error(error);
+    }
   },
 
   // item 추가(POST)
-  addItem: async (item) => {
-    const client = await _client;
-    const db = client.db('TripLogV2').collection('checklist');
-    const result = await db.updateOne(
-      { nickName: item.nickName, 'items.title': item.title },
-      {
-        $addToSet: {
-          'items.$.content': item.item,
-        },
+  addItem: async (data) => {
+    try {
+      const client = await _client;
+      const checklistdb = client.db('TripLogV2').collection('checklist');
+      const userdata = await checklistdb.findOne({ nickname: data.user });
+
+      if (userdata) {
+        // userdata가 존재할 경우에만 처리
+        const { title, item } = data;
+
+        const matchingItem = userdata.items.content.find(
+          (itemContent) => itemContent.title === title
+        );
+
+        if (matchingItem) {
+          // title이 일치하는 경우
+          if (!matchingItem.items) {
+            matchingItem.items = [];
+          }
+          matchingItem.items.push({ item, checked: false });
+        }
+
+        // userdata 업데이트
+        await checklistdb.updateOne({ _id: userdata._id }, { $set: userdata });
       }
-    );
-    if (result.acknowledged) {
-      return item;
-    } else {
-      throw new Error('통신 이상');
+    } catch (error) {
+      console.error(error);
     }
   },
 
