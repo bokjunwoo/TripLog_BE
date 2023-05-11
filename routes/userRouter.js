@@ -162,7 +162,7 @@ router.post('/local', (req, res, next) => {
 
 // 카카오로그인(POST)
 router.post('/kakao', async (req, res, next) => {
-  const kakaoLogin = req.body.data;
+  const kakaoLogin = req.body;
 
   const client = await _client;
   const userdb = client.db('TripLogV2').collection('user');
