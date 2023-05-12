@@ -4,6 +4,8 @@ const _client = mongoClient.connect();
 
 const crypto = require('crypto');
 
+const checklist = require('../data/checklist');
+
 // 비밀 번호 생성용 함수
 const createHashedPassword = (password) => {
   const salt = crypto.randomBytes(64).toString('base64');
@@ -12,17 +14,6 @@ const createHashedPassword = (password) => {
     .toString('base64');
   return { hashedPassword, salt };
   // 해싱할 값, salt, 해시 함수 반복 횟수, 해시 값 길이, 해시 알고리즘
-};
-
-// 사용자가 로그인 시 입력하는 비밀 번호 값과 DB에 저장 된 비밀 번호 값을 비교하여
-// 로그인 성공 여부를 판단해주는 함수
-const verifyPassword = (password, salt, userPassword) => {
-  const hashed = crypto
-    .pbkdf2Sync(password, salt, 10, 64, 'sha512')
-    .toString('base64');
-
-  if (hashed === userPassword) return true;
-  return false;
 };
 
 const userDB = {
@@ -68,10 +59,12 @@ const userDB = {
     const checkdb = client.db('TripLogV2').collection('checklist');
 
     const localregisterType = localRegister.type;
-    const localregisterData = localRegister.data;
+    const localregisterEmail = localRegister.email;
+    const localregisterPassword = localRegister.password;
+    const localregisterNickname = localRegister.nickname;
 
     const duplicatedEmail = await userdb.findOne({
-      email: localregisterData.email,
+      email: localregisterEmail,
     });
 
     if (duplicatedEmail) {
@@ -83,7 +76,7 @@ const userDB = {
     }
 
     const duplicatedNickname = await userdb.findOne({
-      nickname: localregisterData.nickname,
+      nickname: localregisterNickname,
     });
 
     if (duplicatedNickname) {
@@ -94,12 +87,12 @@ const userDB = {
       };
     }
 
-    const hash = createHashedPassword(localregisterData.password);
+    const hash = createHashedPassword(localregisterPassword);
 
     const registerUser = {
       type: localregisterType,
-      email: localregisterData.email,
-      nickname: localregisterData.nickname,
+      email: localregisterEmail,
+      nickname: localregisterNickname,
       password: hash.hashedPassword,
       salt: hash.salt,
       image: '',
@@ -108,13 +101,13 @@ const userDB = {
     const result = await userdb.insertOne(registerUser);
 
     const chargeInsert = await chargedb.insertOne({
-      nickname: localregisterData.nickname,
+      nickname: localregisterNickname,
       chargeList: [],
     });
 
     const checkInsert = await checkdb.insertOne({
-      nickname: localregisterData.nickname,
-      items: checklist,
+      nickname: localregisterNickname,
+      checklist,
     });
 
     if (
@@ -129,88 +122,6 @@ const userDB = {
       };
     } else {
       throw new Error('통신 이상');
-    }
-  },
-
-  // 카카오 회원 가입 모듈
-  kakaoRegister: async (kakaoRegister) => {
-    const client = await _client;
-    const userdb = client.db('TripLogV2').collection('user');
-    const chargedb = client.db('TripLogV2').collection('charge');
-    const checkdb = client.db('TripLogV2').collection('checklist');
-
-    const kakaoRegisterType = kakaoRegister.type;
-    const kakaoRegisterData = kakaoRegister.data;
-
-    const duplicatedNickname = await userdb.findOne({
-      nickname: kakaoRegisterData.nickname,
-    });
-
-    if (duplicatedNickname) {
-      return {
-        type: 'signup',
-        success: false,
-        message: '중복된 닉네임이 존재해 실패하였습니다.',
-      };
-    }
-
-    const registerUser = {
-      type: kakaoRegisterType,
-      id: kakaoRegisterData.id,
-      nickname: kakaoRegisterData.nickname,
-      image: '',
-    };
-
-    const result = await userdb.insertOne(registerUser);
-
-    const chargeInsert = await chargedb.insertOne({
-      nickname: kakaoRegisterData.nickname,
-      chargeList: [],
-    });
-
-    const checkInsert = await checkdb.insertOne({
-      nickname: kakaoRegisterData.nickname,
-      items: checklist,
-    });
-
-    if (
-      result.acknowledged &&
-      chargeInsert.acknowledged &&
-      checkInsert.acknowledged
-    ) {
-      return {
-        type: 'login',
-        success: true,
-        message: '로그인이 완료되었습니다.',
-        nickname: kakaoRegisterData.nickname,
-      };
-    } else {
-      throw new Error('통신 이상');
-    }
-  },
-
-  // 로그인(POST)
-  kakaoLogin: async (kakaoLogin) => {
-    const client = await _client;
-    const userdb = client.db('TripLogV2').collection('user');
-    // 로그인 시 입력한 email 정보가 db 에 있는지 체크
-    const user = await userdb.findOne({ id: kakaoLogin.id });
-
-    if (user) {
-      return {
-        type: 'login',
-        success: true,
-        message: '카카오 로그인이 성공했습니다.',
-        nickname: user.nickname,
-      };
-    }
-
-    if (!user) {
-      return {
-        type: 'signup',
-        success: true,
-        message: '닉네임 정보가 필요합니다.',
-      };
     }
   },
 
