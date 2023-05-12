@@ -6,12 +6,12 @@ const mongoDB = require('../controllers/checklist');
 
 // item 요청(POST)
 router.post('/', async (req, res) => {
-  const data = await mongoDB.postItem(req.body);
+  const data = await mongoDB.postItem(req.user);
   res.send(data);
 });
 
 // item 추가(POST)
-router.post('/addItem', async (req, res) => {
+router.post('/add', async (req, res) => {
   const data = await mongoDB.addItem(req.body);
   res.send(JSON.stringify(data));
 });

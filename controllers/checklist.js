@@ -29,7 +29,7 @@ const checkDB = {
         // userdata가 존재할 경우에만 처리
         const { title, item } = data;
 
-        const matchingItem = userdata.items.content.find(
+        const matchingItem = userdata.checklist.content.find(
           (itemContent) => itemContent.title === title
         );
 
@@ -42,7 +42,13 @@ const checkDB = {
         }
 
         // userdata 업데이트
-        await checklistdb.updateOne({ _id: userdata._id }, { $set: userdata });
+        const result = await checklistdb.updateOne(
+          { _id: userdata._id },
+          { $set: userdata }
+        );
+        if (result.acknowledged) {
+          return userdata;
+        }
       }
     } catch (error) {
       console.error(error);
