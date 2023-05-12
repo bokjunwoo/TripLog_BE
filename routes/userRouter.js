@@ -106,7 +106,7 @@ router.post('/kakaoregister', async (req, res, next) => {
 
   const checkInsert = await checkdb.insertOne({
     nickname: kakaoRegisterData.nickname,
-    items: checklist,
+    checklist,
   });
 
   if (
