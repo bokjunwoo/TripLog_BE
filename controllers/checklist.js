@@ -71,17 +71,42 @@ const checkDB = {
   },
 
   // checked 삭제(DELETE)
-  deleteItem: async (el) => {
-    const client = await _client;
-    const db = client.db('TripLogV2').collection('checklist');
-    const result = await db.updateOne(
-      { nickName: el.nickName, 'items.title': el.title },
-      { $pull: { 'items.$.content': el.item } }
-    );
-    if (result.acknowledged) {
-      return '삭제 되었습니다.';
-    } else {
-      throw new Error('통신 이상');
+  deleteItem: async (data) => {
+    try {
+      const client = await _client;
+      const checklistdb = client.db('TripLogV2').collection('checklist');
+      const userdata = await checklistdb.findOne({ nickname: data.user });
+
+      if (userdata) {
+        // userdata가 존재할 경우에만 처리
+        const { title, item } = data;
+
+        const deleteData = userdata.checklist.content.map((itemContent) => {
+          if (itemContent.title === title) {
+            const deleteItems = itemContent.items.filter(
+              (checklistItem) => checklistItem.item !== item
+            );
+            return {
+              ...itemContent,
+              items: deleteItems,
+            };
+          }
+          return itemContent;
+        });
+
+        const result = await checklistdb.updateOne(
+          { nickname: data.user },
+          { $set: { 'checklist.content': deleteData } }
+        );
+
+        if (result.acknowledged) {
+          return '업데이트 성공';
+        } else {
+          throw new Error('통신 이상');
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
   },
 };

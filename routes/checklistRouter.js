@@ -23,7 +23,7 @@ router.post('/checked', async (req, res) => {
 });
 
 // checked 삭제(DELETE)
-router.delete('/deleteItem', async (req, res) => {
+router.delete('/delete', async (req, res) => {
   const data = await mongoDB.deleteItem(req.body);
   res.send(data);
 });
