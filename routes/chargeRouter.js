@@ -11,8 +11,8 @@ router.post('/', async (req, res) => {
 });
 
 // 금액 만들기(POST)
-router.post('/write', async (req, res) => {
-  const data = await mongoDB.saveCharge(req.body);
+router.post('/add', async (req, res) => {
+  const data = await mongoDB.addCharge(req.body);
   res.send(JSON.stringify(data));
 });
 

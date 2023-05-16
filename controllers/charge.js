@@ -19,22 +19,27 @@ const chargeDB = {
   },
 
   // 금액 추가(POST)
-  saveCharge: async (data) => {
-    const client = await _client;
-    const db = client.db('TripLogV2').collection('charge');
-    const charge = await db.updateOne(
-      { nickName: data.nickName },
-      {
-        $addToSet: {
-          chargeList: data.chargeList,
-        },
-      }
-    );
+  addCharge: async (data) => {
+    console.log(data)
+    try {
+      const client = await _client;
+      const chargedb = client.db('TripLogV2').collection('charge');
+      const { user, date, title, price } = data;
 
-    if (charge.acknowledged) {
-      return charge;
-    } else {
-      throw new Error('통신 이상');
+      const result = await chargedb.updateOne(
+        {
+          nickname: user,
+        },
+        { $addToSet: { chargeList: { id: Date(), date, title, price } } }
+      );
+
+      if (result.acknowledged) {
+        return '데이터 추가 완료';
+      } else {
+        throw new Error('통신 이상');
+      }
+    } catch (error) {
+      console.error(error)
     }
   },
 
