@@ -4,11 +4,18 @@ const _client = mongoClient.connect();
 
 const chargeDB = {
   // 금액 요청(POST)
-  postCharge: async ({ nickName }) => {
-    const client = await _client;
-    const db = client.db('TripLogV2').collection('charge');
-    const data = await db.findOne({ nickName: nickName });
-    return data;
+  postCharge: async (user) => {
+    try {
+      if (!user) {
+        return null;
+      }
+      const client = await _client;
+      const db = client.db('TripLogV2').collection('charge');
+      const data = await db.findOne({ nickname: user.nickname });
+      return data;
+    } catch (error) {
+      console.error(error);
+    }
   },
 
   // 금액 추가(POST)

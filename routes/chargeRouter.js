@@ -6,7 +6,7 @@ const mongoDB = require('../controllers/charge');
 
 // 금액 요청(POST)
 router.post('/', async (req, res) => {
-  const data = await mongoDB.postCharge(req.body);
+  const data = await mongoDB.postCharge(req.user);
   res.send(JSON.stringify(data));
 });
 
