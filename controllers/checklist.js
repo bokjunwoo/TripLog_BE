@@ -56,19 +56,28 @@ const checkDB = {
   },
 
   // checked 변경(POST)
-  checkedItem: async (el) => {
-    const client = await _client;
-    const db = client.db('TripLogV2').collection('checklist');
-    const result = await db.updateOne(
-      { nickName: el.nickName },
-      { $set: { checked: el.checked } }
-    );
-    if (result.acknowledged) {
-      return '업데이트 성공';
-    } else {
-      throw new Error('통신 이상');
+  checkedItem: async (data) => {
+    try {
+      const client = await _client;
+      const checklistdb = client.db('TripLogV2').collection('checklist');
+      const { user, title, item, checked } = data;
+  
+      const result = await checklistdb.updateOne(
+        { nickname: user, 'checklist.content.title': title, 'checklist.content.items.item': item },
+        { $set: { 'checklist.content.$.items.$[elem].checked': checked } },
+        { arrayFilters: [{ 'elem.item': item }] }
+      );
+  
+      if (result.acknowledged) {
+        return '업데이트 성공';
+      } else {
+        throw new Error('통신 이상');
+      }
+    } catch (error) {
+      console.error(error);
     }
   },
+  
 
   // checked 삭제(DELETE)
   deleteItem: async (data) => {

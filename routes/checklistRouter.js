@@ -17,9 +17,9 @@ router.post('/add', async (req, res) => {
 });
 
 // checked 변경(POST)
-router.post('/checked', async (req, res) => {
-  const msg = await mongoDB.checkedItem(req.body);
-  res.send(msg);
+router.patch('/checked', async (req, res) => {
+  const data = await mongoDB.checkedItem(req.body);
+  res.send(data);
 });
 
 // checked 삭제(DELETE)
