@@ -23,32 +23,15 @@ const checkDB = {
     try {
       const client = await _client;
       const checklistdb = client.db('TripLogV2').collection('checklist');
-      const userdata = await checklistdb.findOne({ nickname: data.user });
+      const { user, title, item } = data;
 
-      if (userdata) {
-        // userdata가 존재할 경우에만 처리
-        const { title, item } = data;
+      const result = await checklistdb.updateOne(
+        { nickname: user, 'checklist.content.title': title },
+        { $push: { 'checklist.content.$.items': { item, checked: false } } }
+      );
 
-        const matchingItem = userdata.checklist.content.find(
-          (itemContent) => itemContent.title === title
-        );
-
-        if (matchingItem) {
-          // title이 일치하는 경우
-          if (!matchingItem.items) {
-            matchingItem.items = [];
-          }
-          matchingItem.items.push({ item, checked: false });
-        }
-
-        // userdata 업데이트
-        const result = await checklistdb.updateOne(
-          { _id: userdata._id },
-          { $set: userdata }
-        );
-        if (result.acknowledged) {
-          return userdata;
-        }
+      if (result.acknowledged) {
+        return '업데이트 성공';
       }
     } catch (error) {
       console.error(error);
@@ -61,13 +44,17 @@ const checkDB = {
       const client = await _client;
       const checklistdb = client.db('TripLogV2').collection('checklist');
       const { user, title, item, checked } = data;
-  
+
       const result = await checklistdb.updateOne(
-        { nickname: user, 'checklist.content.title': title, 'checklist.content.items.item': item },
+        {
+          nickname: user,
+          'checklist.content.title': title,
+          'checklist.content.items.item': item,
+        },
         { $set: { 'checklist.content.$.items.$[elem].checked': checked } },
         { arrayFilters: [{ 'elem.item': item }] }
       );
-  
+
       if (result.acknowledged) {
         return '업데이트 성공';
       } else {
@@ -77,42 +64,23 @@ const checkDB = {
       console.error(error);
     }
   },
-  
 
   // checked 삭제(DELETE)
   deleteItem: async (data) => {
     try {
       const client = await _client;
       const checklistdb = client.db('TripLogV2').collection('checklist');
-      const userdata = await checklistdb.findOne({ nickname: data.user });
+      const { user, title, item } = data;
 
-      if (userdata) {
-        // userdata가 존재할 경우에만 처리
-        const { title, item } = data;
+      const result = await checklistdb.updateOne(
+        { nickname: user, 'checklist.content.title': title },
+        { $pull: { 'checklist.content.$.items': { item } } }
+      );
 
-        const deleteData = userdata.checklist.content.map((itemContent) => {
-          if (itemContent.title === title) {
-            const deleteItems = itemContent.items.filter(
-              (checklistItem) => checklistItem.item !== item
-            );
-            return {
-              ...itemContent,
-              items: deleteItems,
-            };
-          }
-          return itemContent;
-        });
-
-        const result = await checklistdb.updateOne(
-          { nickname: data.user },
-          { $set: { 'checklist.content': deleteData } }
-        );
-
-        if (result.acknowledged) {
-          return '업데이트 성공';
-        } else {
-          throw new Error('통신 이상');
-        }
+      if (result.acknowledged) {
+        return '업데이트 성공';
+      } else {
+        throw new Error('통신 이상');
       }
     } catch (error) {
       console.error(error);
