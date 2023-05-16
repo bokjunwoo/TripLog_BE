@@ -20,7 +20,7 @@ const chargeDB = {
 
   // 금액 추가(POST)
   addCharge: async (data) => {
-    console.log(data)
+    console.log(data);
     try {
       const client = await _client;
       const chargedb = client.db('TripLogV2').collection('charge');
@@ -30,7 +30,11 @@ const chargeDB = {
         {
           nickname: user,
         },
-        { $addToSet: { chargeList: { id: Date(), date, title, price } } }
+        {
+          $addToSet: {
+            chargeList: { id: Date(), date, title, price: parseInt(price, 10) },
+          },
+        }
       );
 
       if (result.acknowledged) {
@@ -39,7 +43,7 @@ const chargeDB = {
         throw new Error('통신 이상');
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   },
 
