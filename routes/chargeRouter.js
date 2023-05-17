@@ -17,7 +17,7 @@ router.post('/add', async (req, res) => {
 });
 
 // 금액 삭제(POST)
-router.post('/delete', async (req, res) => {
+router.delete('/delete', async (req, res) => {
   const data = await mongoDB.deleteCharge(req.body);
   res.send(JSON.stringify(data));
 });
