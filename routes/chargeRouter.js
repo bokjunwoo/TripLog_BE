@@ -23,8 +23,8 @@ router.delete('/delete', async (req, res) => {
 });
 
 // 금액 전체삭제(POST)
-router.post('/alldelete', async (req, res) => {
-  const data = await mongoDB.deleteAll(req.body);
+router.delete('/deleteall', async (req, res) => {
+  const data = await mongoDB.deleteAllCharge(req.body);
   res.send(JSON.stringify(data));
 });
 
