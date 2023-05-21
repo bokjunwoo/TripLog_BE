@@ -191,6 +191,39 @@ router.post('/kakao', async (req, res, next) => {
   });
 });
 
+// 패스포트 로그아웃
+router.post('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      // 에러 처리
+      console.error(err);
+      return res.status(500).send({
+        type: 'logout',
+        success: false,
+        message: '로그아웃 중 에러가 발생했습니다.',
+      });
+    }
+
+    req.session.destroy((err) => {
+      if (err) {
+        // 에러 처리
+        console.error(err);
+        return res.status(500).send({
+          type: 'logout',
+          success: false,
+          message: '세션 제거 중 에러가 발생했습니다.',
+        });
+      }
+
+      res.send({
+        type: 'logout',
+        success: true,
+        message: '로그아웃 되었습니다.',
+      });
+    });
+  });
+});
+
 // 유저 IMG(POST)
 router.post('/image', upload.single('image'), async (req, res) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
