@@ -25,11 +25,21 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 /* cors */
-const corsOptions = {
+const corsOptionsDev = {
   origin: 'http://localhost:3000',
   credentials: true,
 };
-app.use(cors(corsOptions));
+
+const corsOptionsProd = {
+  origin: 'https://triplog.shop',
+  credentials: true,
+};
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors(corsOptionsDev));
+} else {
+  app.use(cors(corsOptionsProd));
+}
 
 const PORT = 4000;
 
