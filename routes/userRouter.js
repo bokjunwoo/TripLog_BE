@@ -171,7 +171,7 @@ router.post('/kakao', async (req, res, next) => {
   if (!user) {
     return res.send({
       type: 'signup',
-      success: true,
+      success: false,
       message: '닉네임 정보가 필요합니다.',
     });
   }
