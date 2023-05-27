@@ -26,12 +26,12 @@ app.use(passport.session());
 
 /* cors */
 const corsOptionsDev = {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://apis.data.go.kr'],
   credentials: true,
 };
 
 const corsOptionsProd = {
-  origin: 'https://triplog.shop',
+  origin: ['https://triplog.shop', 'https://apis.data.go.kr'],
   credentials: true,
 };
 
