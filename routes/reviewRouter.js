@@ -38,8 +38,8 @@ router.post('/image', upload.single('image'), async (req, res) => {
 });
 
 // 리뷰 작성(POST)
-router.post('/write', async (req, res) => {
-  const data = await mongoDB.postSaveReview(req.body);
+router.post('/add', async (req, res) => {
+  const data = await mongoDB.addReview(req.body);
   res.send(JSON.stringify(data));
 });
 

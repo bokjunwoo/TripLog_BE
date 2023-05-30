@@ -18,45 +18,38 @@ const reviewDB = {
   },
 
   // 리뷰 작성(POST)
-  postSaveReview: async (review) => {
+  addReview: async (review) => {
     const client = await _client;
+    const userdb = client.db('TripLogV2').collection('user');
     const reviewdb = client.db('TripLogV2').collection('review');
-    const regiondb = client.db('TripLogV2').collection(`${review[0].region}`);
+    const regiondb = client.db('TripLogV2').collection(`${review.region}`);
 
-    const contentid = review[0].contentid;
-    const title = review[0].title;
-    const nickName = review[0].nickName;
-    const userImage = review[0].userImage;
-    const content = review[0].contentData;
-    const star = parseInt(review[0].starData);
-    const image = review[0].image;
-    const today = new Date();
-    const writeTime = today.toString();
-    const year = today.getFullYear();
-    const month = ('0' + (today.getMonth() + 1)).slice(-2);
-    const day = ('0' + today.getDate()).slice(-2);
-    const hours = ('0' + today.getHours()).slice(-2);
-    const minutes = ('0' + today.getMinutes()).slice(-2);
-    const dateFull =
-      year + '.' + month + '.' + day + ' ' + hours + ':' + minutes;
+    const user = await userdb.findOne({ nickname: review.user });
+    const region = await regiondb.findOne({ contentid: review.id });
 
-    const saveReview = {
-      writeTime,
+    const contentid = review.id;
+    const title = region.title;
+    const nickname = review.user;
+    const userImage = user.image;
+    const content = review.text;
+    const star = review.star;
+    const time = new Date();
+
+    const addReview = {
       contentid,
       title,
-      nickName,
+      nickname,
       userImage,
       content,
       star,
-      dateFull,
-      image,
+      time,
     };
 
-    const reviewData = await reviewdb.insertOne(saveReview);
+    const reviewData = await reviewdb.insertOne(addReview);
 
     const starData = await regiondb.updateOne(
-      { contentid: contentid },
-      { $push: { star: { star: star, writeTime: writeTime } } }
+      { contentid },
+      { $push: { star: { star, time, nickname } } }
     );
 
     if (reviewData.acknowledged && starData.acknowledged) {
