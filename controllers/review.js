@@ -59,14 +59,6 @@ const reviewDB = {
     }
   },
 
-  // 리뷰 수정(GET)
-  getEmendReview: async (_id) => {
-    const client = await _client;
-    const db = client.db('TripLogV2').collection('review');
-    const data = await db.findOne({ _id: ObjectId(_id) });
-    return data;
-  },
-
   // 리뷰 수정(POST)
   postEmendReview: async (emendData) => {
     const contentId = emendData[0].emendId;

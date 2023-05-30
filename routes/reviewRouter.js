@@ -43,12 +43,6 @@ router.post('/add', async (req, res) => {
   res.send(JSON.stringify(data));
 });
 
-// 리뷰 수정(GET)
-router.get('/emend/:_id', async (req, res) => {
-  const data = await mongoDB.getEmendReview(req.params._id);
-  res.send(JSON.stringify(data));
-});
-
 // 리뷰 수정(POST)
 router.post('/emend', async (req, res) => {
   const data = await mongoDB.postEmendReview(req.body);
