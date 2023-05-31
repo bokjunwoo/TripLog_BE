@@ -44,8 +44,8 @@ router.post('/add', async (req, res) => {
 });
 
 // 리뷰 수정(POST)
-router.post('/emend', async (req, res) => {
-  const data = await mongoDB.postEmendReview(req.body);
+router.post('/edit', async (req, res) => {
+  const data = await mongoDB.editReview(req.body);
   res.send(JSON.stringify(data));
 });
 
