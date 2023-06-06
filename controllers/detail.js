@@ -31,7 +31,10 @@ const checkDB = {
     const client = await _client;
     const db = client.db('TripLogV2').collection('like');
     const data = await db.findOne({ contentid: params.id });
-    return data.likeuser;
+    return {
+      likeuser: data.likeuser,
+      like: data.like,
+    };
   },
 };
 
