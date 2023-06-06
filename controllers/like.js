@@ -6,25 +6,24 @@ const likeDB = {
   // plus 요청(POST)
   likeIncPlus: async (data) => {
     const client = await _client;
-    
     const reviewData = client.db('TripLogV2').collection(`${data.region}`);
-    const likePlus = await reviewData.updateOne(
-      { contentid: data.contentid },
-      { $inc: { like: +1 } }
-    );
-
     const likeData = client.db('TripLogV2').collection('like');
-    const likeInc =  await likeData.updateOne(
-      { contentid: data.contentid },
+
+    const likePlus = await reviewData.updateOne(
+      { contentid: data.id },
       { $inc: { like: +1 } }
-    )
-    const likeUserUpdata = await likeData.updateOne(
-      { contentid: data.contentid },
-      { $push: { likeuser: data.nickName } }
     );
 
-    if (likePlus.acknowledged && likeUserUpdata.acknowledged && likeInc.acknowledged) {
-      return likePlus;
+    const likeUpdate = await likeData.updateOne(
+      { contentid: data.id },
+      {
+        $inc: { like: +1 },
+        $push: { likeuser: data.user },
+      }
+    );
+
+    if (likePlus.acknowledged && likeUpdate.acknowledged) {
+      return true;
     } else {
       throw new Error('통신 이상');
     }
@@ -33,25 +32,24 @@ const likeDB = {
   // minus 요청(POST)
   likeIncMinus: async (data) => {
     const client = await _client;
-    
     const reviewData = client.db('TripLogV2').collection(`${data.region}`);
-    const likePlus = await reviewData.updateOne(
-      { contentid: data.contentid },
-      { $inc: { like: -1 } }
-    );
-
     const likeData = client.db('TripLogV2').collection('like');
-    const likeInc =  await likeData.updateOne(
-      { contentid: data.contentid },
+
+    const likePlus = await reviewData.updateOne(
+      { contentid: data.id },
       { $inc: { like: -1 } }
-    )
-    const likeUserUpdata = await likeData.updateOne(
-      { contentid: data.contentid },
-      { $pull: { likeuser: data.nickName } }
     );
 
-    if (likePlus.acknowledged && likeUserUpdata.acknowledged && likeInc.acknowledged) {
-      return likePlus;
+    const likeUpdate = await likeData.updateOne(
+      { contentid: data.id },
+      {
+        $inc: { like: -1 },
+        $pull: { likeuser: data.user },
+      }
+    );
+
+    if (likePlus.acknowledged && likeUpdate.acknowledged) {
+      return true;
     } else {
       throw new Error('통신 이상');
     }
