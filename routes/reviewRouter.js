@@ -4,6 +4,8 @@ const router = express.Router();
 
 const mongoDB = require('../controllers/review');
 
+const { isLoggedIn } = require('../passport/middleware');
+
 const multer = require('multer');
 
 const fs = require('fs');
@@ -38,19 +40,19 @@ router.post('/image', upload.single('image'), async (req, res) => {
 });
 
 // 리뷰 작성(POST)
-router.post('/add', async (req, res) => {
+router.post('/add', isLoggedIn, async (req, res) => {
   const data = await mongoDB.addReview(req.body);
   res.send(JSON.stringify(data));
 });
 
 // 리뷰 수정(POST)
-router.post('/edit', async (req, res) => {
+router.post('/edit', isLoggedIn, async (req, res) => {
   const data = await mongoDB.editReview(req.body);
   res.send(JSON.stringify(data));
 });
 
 // 리뷰 삭제(DELETE)
-router.delete('/delete', async (req, res) => {
+router.delete('/delete', isLoggedIn, async (req, res) => {
   const data = await mongoDB.deleteReview(req.body);
   res.send(JSON.stringify(data));
 });

@@ -4,6 +4,8 @@ const router = express.Router();
 
 const mongoDB = require('../controllers/user');
 
+const { isLoggedIn } = require('../passport/middleware');
+
 const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
