@@ -19,6 +19,11 @@ app.use(
     secret: 'your-secret-key',
     resave: true,
     saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production' ? true : false,
+      domain: process.env.NODE_ENV === 'production' && '.triplog.shop',
+    },
   })
 );
 app.use(passport.initialize());
