@@ -47,6 +47,20 @@ router.get('/', async (req, res) => {
   }
 });
 
+// 유저이미지 반환
+router.get('/image', async (req, res) => {
+  const userInfo = req.user;
+  try {
+    if (userInfo) {
+      res.send(JSON.stringify(userInfo.image));
+    } else {
+      res.send(JSON.stringify(null));
+    }
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 // 회원가입 아이디 중복확인(POST)
 router.post('/register/idcheck', async (req, res) => {
   const registerId = req.body;
@@ -173,7 +187,7 @@ router.post('/kakao', async (req, res, next) => {
   if (!user) {
     return res.send({
       type: 'signup',
-      success: false,
+      success: true,
       message: '닉네임 정보가 필요합니다.',
     });
   }
@@ -227,10 +241,10 @@ router.post('/logout', (req, res) => {
 });
 
 // 유저 IMG(POST)
-router.post('/image', upload.single('image'), async (req, res) => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-  res.send(JSON.stringify(req.file.filename));
-});
+// router.post('/image', upload.single('image'), async (req, res) => {
+//   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+//   res.send(JSON.stringify(req.file.filename));
+// });
 
 // 유저 이미지 업로드(POST)
 router.post('/upload', async (req, res) => {
