@@ -57,4 +57,10 @@ router.delete('/delete', isLoggedIn, async (req, res) => {
   res.send(JSON.stringify(data));
 });
 
+// 유저 전체 리뷰 (POST)
+router.post('/all', isLoggedIn, async (req, res) => {
+  const data = await mongoDB.allReview(req.user);
+  res.send(JSON.stringify(data));
+});
+
 module.exports = router;

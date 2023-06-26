@@ -86,7 +86,6 @@ const reviewDB = {
 
   // 리뷰 삭제(DELETE)
   deleteReview: async (review) => {
-    console.log(review)
     const client = await _client;
     const reviewdb = client.db('TripLogV2').collection('review');
     const regiondb = client.db('TripLogV2').collection(`${review.region}`);
@@ -117,6 +116,20 @@ const reviewDB = {
       return true;
     } else {
       throw new Error('통신이상');
+    }
+  },
+
+  allReview: async (user) => {
+    try {
+      if (!user) {
+        return null;
+      }
+      const client = await _client;
+      const db = client.db('TripLogV2').collection('review');
+      const data = await db.find({ nickname: user.nickname }).toArray();
+      return data;
+    } catch (error) {
+      console.error(error);
     }
   },
 };
