@@ -25,10 +25,11 @@ const reviewDB = {
     const regiondb = client.db('TripLogV2').collection(`${review.region}`);
 
     const user = await userdb.findOne({ nickname: review.user });
-    const region = await regiondb.findOne({ contentid: review.id });
+    const detail = await regiondb.findOne({ contentid: review.id });
 
     const contentid = review.id;
-    const title = region.title;
+    const region = review.region;
+    const title = detail.title;
     const nickname = review.user;
     const userImage = user.image;
     const content = review.text;
@@ -37,6 +38,7 @@ const reviewDB = {
 
     const addReview = {
       contentid,
+      region,
       title,
       nickname,
       userImage,
