@@ -42,6 +42,23 @@ const planDB = {
       console.error(error);
     }
   },
+
+  deletePlan: async (data) => {
+    console.log(data);
+    const client = await _client;
+    const plandb = client.db('TripLogV2').collection('plan');
+
+    const planData = await plandb.deleteOne({
+      _id: ObjectId(data._id),
+      nickname: data.user,
+    });
+
+    if (planData.acknowledged) {
+      return true;
+    } else {
+      throw new Error('통신이상');
+    }
+  },
 };
 
 module.exports = planDB;

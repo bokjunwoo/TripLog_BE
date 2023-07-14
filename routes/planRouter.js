@@ -23,4 +23,10 @@ router.post('/all', isLoggedIn, async (req, res) => {
   res.send(JSON.stringify(data));
 });
 
+// 플랜 삭제(DELETE)
+router.delete('/delete', isLoggedIn, async (req, res) => {
+  const data = await mongoDB.deletePlan(req.body);
+  res.send(JSON.stringify(data));
+});
+
 module.exports = router;
