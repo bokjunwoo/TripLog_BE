@@ -28,6 +28,20 @@ const planDB = {
       return null;
     }
   },
+
+  allPlan: async (user) => {
+    try {
+      if (!user) {
+        return null;
+      }
+      const client = await _client;
+      const db = client.db('TripLogV2').collection('plan');
+      const data = await db.find({ nickname: user.nickname }).toArray();
+      return data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 module.exports = planDB;
