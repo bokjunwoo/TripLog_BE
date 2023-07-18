@@ -14,11 +14,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 /* passport */
+app.set('trust proxy', 1);
 app.use(
   session({
-    secret: 'your-secret-key',
+    secret: process.env.SECRET_KEY,
     resave: true,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' ? true : false,
@@ -26,6 +28,7 @@ app.use(
     },
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -42,11 +45,13 @@ const corsOptionsProd = {
 
 if (process.env.NODE_ENV === 'development') {
   app.use(cors(corsOptionsDev));
-} else {
+}
+
+if (process.env.NODE_ENV === 'production') {
   app.use(cors(corsOptionsProd));
 }
 
-const PORT = 4000;
+const PORT = process.env.PORT;
 
 /*
 // 데이터 저장하기 위해 전송 데이터 제한해제
