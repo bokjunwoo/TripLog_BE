@@ -36,7 +36,10 @@ const planDB = {
       }
       const client = await _client;
       const db = client.db('TripLogV2').collection('plan');
-      const data = await db.find({ nickname: user.nickname }).toArray();
+      const data = await db
+        .find({ nickname: user.nickname })
+        .sort({ _id: -1 }) // _id 필드를 기준으로 역순으로 정렬
+        .toArray();
       return data;
     } catch (error) {
       console.error(error);
