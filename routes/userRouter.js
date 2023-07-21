@@ -1,29 +1,32 @@
 const express = require('express');
+const path = require('path');
 
 const router = express.Router();
 
 const mongoDB = require('../controllers/user');
-
-const { isLoggedIn } = require('../passport/middleware');
-
 const mongoClient = require('../routes/mongo');
 const _client = mongoClient.connect();
 
+const { isLoggedIn } = require('../passport/middleware');
+
 const checklist = require('../data/checklist');
+
+const passport = require('passport');
 
 const multer = require('multer');
 
 const fs = require('fs');
-const passport = require('passport');
 
 const dir = './uploads';
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, dir);
+  destination(req, file, done) {
+    done(null, dir);
   },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '_' + Date.now());
+  filename(req, file, done) {
+    const ext = path.extname(file.originalname); // 확장자 추출
+    const basename = path.basename(file.originalname, ext); // 파일 이름 추출
+    done(null, basename + new Date().getTime() + ext); // 파일이름 + 시각 + 확장자
   },
 });
 
@@ -241,15 +244,15 @@ router.post('/logout', (req, res) => {
 });
 
 // 유저 IMG(POST)
-// router.post('/image', upload.single('image'), async (req, res) => {
-//   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-//   res.send(JSON.stringify(req.file.filename));
-// });
+router.post('/image', isLoggedIn, upload.single('image'), async (req, res) => {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+  res.send(JSON.stringify(req.file.filename));
+});
 
 // 유저 이미지 업로드(POST)
-router.post('/upload', async (req, res) => {
-  const data = await mongoDB.updateImage(req.body);
-  res.send(JSON.stringify(data));
-});
+// router.post('/upload', async (req, res) => {
+//   const data = await mongoDB.updateImage(req.body);
+//   res.send(JSON.stringify(data));
+// });
 
 module.exports = router;
