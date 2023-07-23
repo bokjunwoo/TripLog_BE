@@ -26,7 +26,8 @@ const storage = multer.diskStorage({
   filename(req, file, done) {
     const ext = path.extname(file.originalname); // 확장자 추출
     const basename = path.basename(file.originalname, ext); // 파일 이름 추출
-    done(null, basename + new Date().getTime() + ext); // 파일이름 + 시각 + 확장자
+    const timestamp = new Date().getTime().toString().slice(-6); // First 6 characters of the current timestamp
+    done(null, basename + '_' + new Date().getTime() + timestamp + ext); // 파일이름 + 초단위 타임스탬프 + 확장자
   },
 });
 
@@ -246,13 +247,13 @@ router.post('/logout', (req, res) => {
 // 유저 IMG(POST)
 router.post('/image', isLoggedIn, upload.single('image'), async (req, res) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-  res.send(JSON.stringify(req.file.filename));
+  res.json(req.file.filename);
 });
 
 // 유저 이미지 업로드(POST)
-// router.post('/upload', async (req, res) => {
-//   const data = await mongoDB.updateImage(req.body);
-//   res.send(JSON.stringify(data));
-// });
+router.post('/upload', async (req, res) => {
+  const data = await mongoDB.updateImage(req.body);
+  res.send(JSON.stringify(data));
+});
 
 module.exports = router;

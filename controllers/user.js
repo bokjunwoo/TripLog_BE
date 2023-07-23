@@ -126,12 +126,12 @@ const userDB = {
   },
 
   // 유저 이미지 업로드(POST)
-  updateImage: async (user) => {
+  updateImage: async (data) => {
     const client = await _client;
     const userdb = client.db('TripLogV2').collection('user');
 
-    const nickname = user[0].nickname;
-    const image = user[0].image;
+    const nickname = data.user;
+    const image = data.image;
 
     const updataRes = await userdb.updateOne(
       { nickname: nickname },
