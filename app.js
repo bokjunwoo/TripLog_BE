@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const passport = require('passport');
 const session = require('express-session');
@@ -10,6 +11,7 @@ const app = express();
 
 passportConfig();
 
+app.use(express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
