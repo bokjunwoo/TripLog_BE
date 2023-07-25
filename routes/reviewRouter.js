@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 
 const router = express.Router();
 
@@ -12,20 +13,19 @@ const fs = require('fs');
 
 const dir = './uploads';
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, dir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '_' + Date.now());
-  },
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, 'uploads');
+    },
+    filename(req, file, done) {
+      const ext = path.extname(file.originalname); // 확장자 추출
+      const basename = path.basename(file.originalname, ext);
+      done(null, basename + '_' + new Date().getTime() + ext);
+    },
+  }),
+  limits: { fieldSize: 20 * 1024 * 1024 },
 });
-
-const limits = {
-  fileSize: 1024 * 1024 * 2,
-};
-
-const upload = multer({ storage, limits });
 
 // 디테일페이지 리뷰 요청(GET)
 router.get('/:contentId', async (req, res) => {
@@ -61,6 +61,11 @@ router.delete('/delete', isLoggedIn, async (req, res) => {
 router.post('/all', isLoggedIn, async (req, res) => {
   const data = await mongoDB.allReview(req.user);
   res.send(JSON.stringify(data));
+});
+
+// 리뷰 IMG(POST)
+router.post('/images', isLoggedIn, upload.array('image'), async (req, res) => {
+  res.json(req.files.map((v) => v.filename));
 });
 
 module.exports = router;
