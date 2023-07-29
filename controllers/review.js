@@ -35,6 +35,7 @@ const reviewDB = {
     const content = review.text;
     const star = review.star;
     const time = new Date();
+    const reviewImage = review.image;
 
     const addReview = {
       contentid,
@@ -45,6 +46,7 @@ const reviewDB = {
       content,
       star,
       time,
+      reviewImage,
     };
 
     const reviewData = await reviewdb.insertOne(addReview);
