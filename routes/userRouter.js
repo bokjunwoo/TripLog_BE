@@ -14,11 +14,20 @@ const checklist = require('../data/checklist');
 const passport = require('passport');
 
 const multer = require('multer');
+const multerS3 = require('multer-s3');
+const AWS = require('aws-sdk');
+
+AWS.config.update({
+  accessKeyId: process.env.S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+  region: 'ap-northeast-2',
+});
 
 const fs = require('fs');
 
 const dir = './uploads';
 
+/* 로컬
 const storage = multer.diskStorage({
   destination(req, file, done) {
     done(null, dir);
@@ -28,6 +37,15 @@ const storage = multer.diskStorage({
     const basename = path.basename(file.originalname, ext); // 파일 이름 추출
     const timestamp = new Date().getTime().toString().slice(-6); // First 6 characters of the current timestamp
     done(null, basename + '_' + new Date().getTime() + timestamp + ext); // 파일이름 + 초단위 타임스탬프 + 확장자
+  },
+});
+*/
+
+const storage = multerS3({
+  s3: new AWS.S3(),
+  bucket: 'triplog',
+  key(req, file, cb) {
+    cb(null, `original/${Date.now()}_${path.basename(file.originalname)}`);
   },
 });
 
@@ -247,7 +265,12 @@ router.post('/logout', (req, res) => {
 // 유저 IMG(POST)
 router.post('/image', isLoggedIn, upload.single('image'), async (req, res) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+  /* 로컬
   res.json(req.file.filename);
+  */
+
+  // S3
+  res.json(req.file.location);
 });
 
 // 유저 이미지 업로드(POST)
