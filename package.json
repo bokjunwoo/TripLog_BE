@@ -4,7 +4,7 @@
     "start": "nodemon --watch \"./routes/*.js\" --exec \"npm run server\""
   },
   "dependencies": {
-    "aws-sdk": "^2.1426.0",
+    "aws-sdk": "^2.1427.0",
     "axios": "^1.4.0",
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
@@ -16,7 +16,8 @@
     "multer": "^1.4.4",
     "multer-s3": "^2.10.0",
     "passport": "^0.6.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "sharp": "^0.32.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
