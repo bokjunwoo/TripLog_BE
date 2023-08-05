@@ -20,9 +20,23 @@ const planDB = {
   searchPlan: async (search) => {
     const client = await _client;
     const db = client.db('TripLogV2').collection(`${search.region}`);
-    const data = await db.findOne({ title: `${search.search}` });
 
-    if (data) {
+    const searchRequirements = [
+      {
+        $search: {
+          index: `${search.region}Title`,
+          text: {
+            query: search.search,
+            path: 'title',
+          },
+        },
+      },
+      { $sort: { _id: -1 } },
+    ];
+
+    const data = await db.aggregate(searchRequirements).toArray();
+
+    if (data.length !== 0) {
       return data;
     } else {
       return null;
