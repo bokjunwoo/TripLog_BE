@@ -21,6 +21,9 @@ const planDB = {
     const client = await _client;
     const db = client.db('TripLogV2').collection(`${search.region}`);
 
+    const pageNumber = search.pageNumber || 1; // 기본 페이지 번호는 1
+    const itemsPerPage = 10; // 페이지당 아이템 수
+
     const searchRequirements = [
       {
         $search: {
@@ -31,13 +34,14 @@ const planDB = {
           },
         },
       },
-      { $sort: { _id: -1 } },
+      { $skip: (pageNumber - 1) * itemsPerPage }, // 스킵할 아이템 수를 계산하여 페이지 설정
+      { $limit: itemsPerPage }, // 페이지당 아이템 수 설정
     ];
 
     const data = await db.aggregate(searchRequirements).toArray();
 
     if (data.length !== 0) {
-      return data;
+      return { data, total };
     } else {
       return null;
     }
