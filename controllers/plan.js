@@ -41,7 +41,7 @@ const planDB = {
     const data = await db.aggregate(searchRequirements).toArray();
 
     if (data.length !== 0) {
-      return { data, total };
+      return data;
     } else {
       return null;
     }
