@@ -114,6 +114,10 @@ app.use('/list', list);
 const mypage = require('./routes/mypageRouter');
 app.use('/mypage', mypage);
 
+// search
+const search = require('./routes/searchRouter');
+app.use('/search', search);
+
 /* 오류발생 */
 app.use((err, req, res, next) => {
   console.log(err.stack);
