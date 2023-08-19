@@ -6,6 +6,14 @@ const searchDB = {
   // params의 데이터 가져오기(GET)
   getList: async (query) => {
     console.log(query);
+    if (query.region === '' || query.title === '') {
+      return {
+        data: null,
+        currentPage: null,
+        totalPage: null,
+      };
+    }
+
     const client = await _client;
     const db = client.db('TripLogV2').collection(`${query.region}`);
 
@@ -24,7 +32,7 @@ const searchDB = {
     const totalItems = await db.countDocuments(searchQuery);
 
     // 전체 페이지 수 계산
-    const totalPages = Math.ceil(totalItems / limit);
+    const totalPage = Math.ceil(totalItems / limit);
 
     // 스킵할 아이템 수를 계산하여 페이지 설정
     const skipItems = (page - 1) * limit;
@@ -40,7 +48,7 @@ const searchDB = {
     return {
       data,
       currentPage: page,
-      totalPages,
+      totalPage,
     };
   },
 };
