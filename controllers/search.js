@@ -15,6 +15,7 @@ const searchDB = {
     }
 
     const client = await _client;
+
     const db = client.db('TripLogV2').collection(`${query.region}`);
 
     const page = parseInt(query.page) || 1; // 기본 페이지는 1
@@ -50,6 +51,62 @@ const searchDB = {
       currentPage: page,
       totalPage,
     };
+  },
+
+  bestList: async (data) => {
+    const client = await _client;
+
+    const collections = {
+      seoul: client.db('TripLogV2').collection('seoul'),
+      busan: client.db('TripLogV2').collection('busan'),
+      gangneung: client.db('TripLogV2').collection('gangneung'),
+      gyeongju: client.db('TripLogV2').collection('gyeongju'),
+      jeonju: client.db('TripLogV2').collection('jeonju'),
+      jeju: client.db('TripLogV2').collection('jeju'),
+    };
+
+    if (data.region && collections[data.region]) {
+      const result = await collections[data.region]
+        .find()
+        .sort({ view: -1 })
+        .limit(8)
+        .toArray();
+
+      return {
+        data: result,
+      };
+    } else {
+      const result = [];
+      const regionNames = [
+        'seoul',
+        'busan',
+        'gangneung',
+        'gyeongju',
+        'jeonju',
+        'jeju',
+      ];
+
+      for (const regionName of regionNames) {
+        const regionData = await collections[regionName]
+          .find()
+          .sort({ view: -1 })
+          .limit(3)
+          .toArray();
+
+        const dataWithRegion = regionData.map((data) => ({
+          ...data,
+          region: regionName, // 컬렉션 이름을 region 속성에 추가
+        }));
+
+        result.push(...dataWithRegion);
+      }
+
+      result.sort((a, b) => b.view - a.view);
+
+      return {
+        data: result,
+      };
+    }
   },
 };
 
