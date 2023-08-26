@@ -25,12 +25,19 @@ router.post('/:id', async (req, res) => {
 
       const response = await axios.get(apiUrl, { withCredentials: true });
 
-      const data = {
-        homepage: response.data.response.body.items.item[0].homepage,
-        overview: response.data.response.body.items.item[0].overview,
-      };
-
-      res.json(data);
+      if (response.data.response.header.resultCode === '0000') {
+        const data = {
+          homepage: '',
+          overview: '',
+        };
+        res.json(data);
+      } else {
+        const data = {
+          homepage: response.data.response.body.items.item[0].homepage,
+          overview: response.data.response.body.items.item[0].overview,
+        };
+        res.json(data);
+      }
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'An error occurred' });
